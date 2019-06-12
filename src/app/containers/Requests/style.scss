@@ -1,0 +1,30 @@
+.requests {
+  .requestsCard {
+    margin: 32px;
+  }
+
+  .requestsNew {
+    float: right;
+  }
+
+  .requestsInactive {
+    opacity: 0.6;
+  }
+
+  .requestsAmount {
+    margin-top: 26px;
+    margin-left: 15px;
+    width: 60px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .requestsAction {
+    font-size: 20px;
+    margin-top: 26px;
+  }
+
+  em {
+    display: none;
+  }
+}
