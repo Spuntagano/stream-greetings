@@ -153,7 +153,7 @@ class NotificationsC extends React.Component<IProps, IState> {
           highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
           searchWords={[this.state.searchText]}
           autoEscape={true}
-          textToHighlight={text.toString()}
+          textToHighlight={(text) ? text.toString() : ''}
         />
       ),
     };
