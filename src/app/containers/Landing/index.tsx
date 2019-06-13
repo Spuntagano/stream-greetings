@@ -159,13 +159,13 @@ class LandingC extends React.Component<IProps, IState> {
   }
 
   public renderHiddenForm() {
-    const { infos, form, location } = this.props;
+    const { infos, form, location, env } = this.props;
 
     return (
-      <form ref={el => this.hiddenFormEl = el} action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+      <form ref={el => this.hiddenFormEl = el} action={env.PAYPAL_PAYMENT_URL} method="post">
         <input type="hidden" name="business" value={infos.data.settings.paypalEmail} />
         <input type="hidden" name="cmd" value="_xclick" />
-        <input type="hidden" name="notify_url" value="https://ur1j3acuch.execute-api.us-east-1.amazonaws.com/LATEST/" />
+        <input type="hidden" name="notify_url" value={env.PAYPAL_API_GATEWAY_URL} />
         <input type="hidden" name="item_name" value={infos.data.requests[this.state.requestIndex].title} />
         <input type="hidden" name="custom" value={JSON.stringify({
           streamer: location.pathname.split('/')[1].toLowerCase(),

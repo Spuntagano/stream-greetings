@@ -6,8 +6,11 @@ export interface IEnv {
   PUB_KEY: string;
 }
 
+const envParam = (typeof URLSearchParams !== 'undefined') ? new URLSearchParams(location.search).get('env') : 'production';
+const env = (envParam) ? envParam : process.env.ENV || 'production';
+
 /** Initial State */
-const initialState: any = process.env.STAGING;
+const initialState: IEnv = process.env[env.toUpperCase() as any] as any;
 
 /** Reducer */
 export function envReducer(state = initialState) {

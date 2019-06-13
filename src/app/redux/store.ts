@@ -18,11 +18,5 @@ export function configureStore(history: History, initialState?: IStore): Store<I
     composeEnhancers(applyMiddleware(...middlewares))
   );
 
-  if ((module as any).hot) {
-    (module as any).hot.accept('./reducers', () => {
-      store.replaceReducer(require('./reducers'));
-    });
-  }
-
   return store;
 }

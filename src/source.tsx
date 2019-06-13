@@ -23,17 +23,3 @@ if (!entryNode) {
 }
 
 ReactDOM.render(entry, entryNode);
-
-if ((module as any).hot) {
-  (module as any).hot.accept();
-
-  (module as any).hot.accept('./app/routes', () => {
-    ReactDOM.unmountComponentAtNode(entryNode);
-    ReactDOM.render(
-      <Provider store={store}>
-        <Source />
-      </Provider>,
-      entryNode
-    );
-  });
-}

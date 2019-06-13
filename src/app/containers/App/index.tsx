@@ -8,7 +8,6 @@ import { IStore } from '../../redux/IStore';
 import { Navigation } from '../../components';
 import { renderRoutes } from 'react-router-config';
 import { routes } from '../../routes';
-import { hot } from 'react-hot-loader';
 import Icon from 'antd/lib/icon';
 import notification from 'antd/lib/notification';
 import Layout from 'antd/lib/layout';
@@ -72,4 +71,4 @@ export const App = connect(
     return { configs: state.configs };
   },
   (d: Dispatch<IConfigsAction>) => ({ dispatch: d })
-)(hot(module)(AppC) as any);
+)(AppC);

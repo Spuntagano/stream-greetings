@@ -28,19 +28,3 @@ if (!entryNode) {
 }
 
 ReactDOM.hydrate(entry, entryNode);
-
-if ((module as any).hot) {
-  (module as any).hot.accept();
-
-  (module as any).hot.accept('./app/routes', () => {
-    ReactDOM.unmountComponentAtNode(entryNode);
-    ReactDOM.render(
-      <Provider store={store}>
-        <HashRouter>
-          {renderRoutes(routes)}
-        </HashRouter>>
-      </Provider>,
-      entryNode
-    );
-  });
-}

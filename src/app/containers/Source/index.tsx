@@ -47,6 +47,7 @@ class SourceC extends React.Component<IProps, IState> {
   public async componentDidMount() {
     const { dispatch } = this.props;
 
+    // todo: receive settings
     this.websocket.connect();
     window.Streamlabs.onMessage((event: MessageEvent) => {
       switch (event.type) {
