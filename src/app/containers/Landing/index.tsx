@@ -10,6 +10,7 @@ import Col from 'antd/lib/col';
 import Row from 'antd/lib/row';
 import Modal from 'antd/lib/Modal';
 import Form from 'antd/lib/form';
+import numeral from 'numeral';
 import Button from 'antd/lib/button';
 import LinesEllipsis from 'react-lines-ellipsis';
 import { Spinner } from '../../components';
@@ -111,6 +112,7 @@ class LandingC extends React.Component<IProps, IState> {
                 style={{ height: '125px' }}
               />}
             />
+            <strong>{numeral(request.amount).format('0.00$')}</strong>
           </Card>
         </Col>
       );
@@ -215,7 +217,8 @@ class LandingC extends React.Component<IProps, IState> {
                 </Button>
               }
             >
-              {infos.data.requests[this.state.requestIndex].description}
+              <strong>{numeral(infos.data.requests[this.state.requestIndex].amount).format('0.00$')}</strong>
+              <p>{infos.data.requests[this.state.requestIndex].description}</p>
               {this.renderForm()}
               {this.renderHiddenForm()}
         </Modal>}
