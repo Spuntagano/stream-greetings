@@ -37,11 +37,6 @@ interface IState {
 }
 
 class RequestsC extends React.Component<IProps> {
-  private onSubmit: () => (e: React.FormEvent<HTMLFontElement>) => void;
-  private onFormModalShow: (editIndex: number) => (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
-  private onDelete: (deleteIndex: number) => (e: React.MouseEvent<HTMLAnchorElement>) => void;
-  private onFormModalCancel: () => () => void;
-  private bindRenderListItem: () => (data: IRequest, index: number) => void;
   public state: IState;
 
   constructor(props: IProps) {
@@ -51,12 +46,6 @@ class RequestsC extends React.Component<IProps> {
       showFormModal: false,
       editIndex: 0
     };
-
-    this.onSubmit = () => this.submit.bind(this);
-    this.onFormModalShow = (editIndex: number) => this.formModalShow.bind(this, editIndex);
-    this.onDelete = (deleteIndex: number) => this.delete.bind(this, deleteIndex);
-    this.onFormModalCancel = () => this.formModalCancel.bind(this);
-    this.bindRenderListItem = () => this.renderListItem.bind(this);
   }
 
   public async componentDidMount() {
@@ -65,7 +54,7 @@ class RequestsC extends React.Component<IProps> {
     getRequests(dispatch);
   }
 
-  private async submit(e: React.FormEvent<any>) {
+  private onSubmit = (e: React.FormEvent<any>) => {
     const { dispatch, form, requests } = this.props;
     e.preventDefault();
 
@@ -89,7 +78,7 @@ class RequestsC extends React.Component<IProps> {
     });
   }
 
-  private async delete(deleteIndex: number) {
+  private onDelete = (deleteIndex: number) => async () => {
     const { dispatch, requests } = this.props;
 
     try {
@@ -108,14 +97,14 @@ class RequestsC extends React.Component<IProps> {
     }
   }
 
-  private formModalCancel() {
+  private onFormModalCancel = () => {
     const { form } = this.props;
 
     this.setState({ showFormModal: false });
     form.resetFields();
   }
 
-  private formModalShow(editIndex: number) {
+  private onFormModalShow = (editIndex: number) => () => {
     const { form, requests } = this.props;
 
     this.setState({
@@ -126,7 +115,7 @@ class RequestsC extends React.Component<IProps> {
     form.setFieldsValue(requests.data[editIndex]);
   }
 
-  private onImageUpload = (url: string) => {
+  private onImageUpload = (url: string) => () => {
     const { form } = this.props;
 
     form.setFieldsValue({
@@ -142,13 +131,13 @@ class RequestsC extends React.Component<IProps> {
     });
   }
 
-  private renderForm() {
+  private renderForm = () => {
     const { form, requests } = this.props;
     const imageKey = cryptoJs.SHA256(form.getFieldValue('title') || '' + this.state.editIndex).toString();
     const imageUrl = (requests.data[this.state.editIndex]) ? requests.data[this.state.editIndex].imageUrl : '';
 
     return (
-      <Form id="request-form-modal" onSubmit={this.onSubmit()}>
+      <Form id="request-form-modal" onSubmit={this.onSubmit}>
         <Form.Item label="Title">
           {form.getFieldDecorator('title', {
             rules: [
@@ -198,19 +187,19 @@ class RequestsC extends React.Component<IProps> {
     );
   }
 
-  private renderList() {
+  private renderList = () => {
     const { requests } = this.props;
 
     return (
       <List
         itemLayout="horizontal"
         dataSource={requests.data}
-        renderItem={this.bindRenderListItem()}
+        renderItem={this.renderListItem}
       />
     );
   }
 
-  private renderListItem(data: IRequest, index: number) {
+  private renderListItem = (data: IRequest, index: number) => {
     return (
       <List.Item className={(!data.active) ? style.requestsInactive : ''} actions={[
         <Icon className={style.requestsAction} onClick={this.onFormModalShow(index)} key="edit" type="edit" />,
@@ -245,7 +234,7 @@ class RequestsC extends React.Component<IProps> {
               <Modal
                 title="Edit request"
                 visible={this.state.showFormModal}
-                onCancel={this.onFormModalCancel()}
+                onCancel={this.onFormModalCancel}
                 footer={[
                   <Button form="request-form-modal" key="submit" htmlType="submit" type="primary">
                     Save

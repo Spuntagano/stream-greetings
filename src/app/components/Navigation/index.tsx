@@ -29,7 +29,7 @@ class NavigationC extends React.Component<RouteComponentProps> {
             <Link to={{
               pathname: '/feed',
               search: location.search
-            }}>Requests</Link>
+            }}>Notifications</Link>
           </Menu.Item>
         </Menu>
       </div>

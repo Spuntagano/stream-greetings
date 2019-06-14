@@ -24,6 +24,10 @@ export default class Websocket {
 
     public disconnect() {
         if (this.websocket) {
+            this.websocket.onclose = null;
+            if (this.onClose) {
+                this.onClose();
+            }
             this.websocket.close();
         }
     }

@@ -37,8 +37,6 @@ class SourceC extends React.Component<IProps, IState> {
       display: false
     };
 
-    this.shiftRequest = this.shiftRequest.bind(this);
-    this.showRequest = this.showRequest.bind(this);
     this.sound = new Audio('/assets/audio/default.mp3');
 
     this.websocket = new Websocket(props.env.WS_API_GATEWAY, this.onMessage);
@@ -97,7 +95,7 @@ class SourceC extends React.Component<IProps, IState> {
     });
   }
 
-  private showRequest() {
+  private showRequest = () => {
     const { settings } = this.props;
 
     setTimeout(() => {
@@ -117,7 +115,7 @@ class SourceC extends React.Component<IProps, IState> {
     }, 8000);
   }
 
-  public shiftRequest() {
+  public shiftRequest = () => {
     this.setState((prevState: IState) => {
       const newNotifications: INotification[] = [...prevState.notifications];
       newNotifications.shift();

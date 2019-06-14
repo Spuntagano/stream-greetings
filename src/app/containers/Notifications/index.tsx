@@ -62,23 +62,12 @@ interface INotificationTransformed {
 }
 
 class NotificationsC extends React.Component<IProps, IState> {
-  private onReplay: (index: number) => () => void;
-  private bindDataTransformer: () => (data: INotification, index: number) => INotificationTransformed;
-  private onHandleSearch: (selectedKeys: string[], confirm: () => {}) =>
-    (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent) => void;
-  private onHandleReset: (clearFilters: () => void) => () =>  void;
-  private onSetSelectedKeys = (setSelectedKeys: (event: any[]) => void) => (e: any) => setSelectedKeys(e);
   private searchInput: Input | null;
   private websocket: Websocket;
 
   constructor(props: IProps) {
     super(props);
 
-    this.onReplay = (index: number) => this.replay.bind(this, index);
-    this.bindDataTransformer = () => this.dataTransformer.bind(this);
-    this.onHandleSearch = (selectedKeys: string[], confirm: () => {}) => this.handleSearch.bind(this, selectedKeys, confirm);
-    this.onHandleReset = (clearFilters: () => void) => () => this.handleReset(clearFilters);
-    this.onSetSelectedKeys = (setSelectedKeys: (event: any[]) => void) => (e: any) => setSelectedKeys(e.target.value ? [e.target.value] : []);
     this.searchInput = null;
     this.state = {
       searchText: ''
@@ -107,7 +96,7 @@ class NotificationsC extends React.Component<IProps, IState> {
     addNotification(dispatch, message);
   }
 
-  private getColumnSearchProps(dataIndex: string) {
+  private getColumnSearchProps = (dataIndex: string) => {
     return {
       filterDropdown: ({ selectedKeys, setSelectedKeys, confirm, clearFilters }: IFilter) => (
         <div style={{ padding: 8 }}>
@@ -118,19 +107,19 @@ class NotificationsC extends React.Component<IProps, IState> {
             placeholder={`Search ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={this.onSetSelectedKeys(setSelectedKeys)}
-            onPressEnter={this.onHandleSearch(selectedKeys, confirm)}
+            onPressEnter={this.handleSearch(selectedKeys, confirm)}
             style={{ width: 188, marginBottom: 8, display: 'block' }}
           />
           <Button
             type="primary"
-            onClick={this.onHandleSearch(selectedKeys, confirm)}
+            onClick={this.handleSearch(selectedKeys, confirm)}
             icon="search"
             size="small"
             style={{ width: 90, marginRight: 8 }}
           >
             Search
           </Button>
-          <Button onClick={this.onHandleReset(clearFilters)} size="small" style={{ width: 90 }}>
+          <Button onClick={this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
             Reset
         </Button>
         </div>
@@ -138,11 +127,12 @@ class NotificationsC extends React.Component<IProps, IState> {
       filterIcon: (filtered: boolean) => (
         <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
       ),
-      onFilter: (value: string, record: any) =>
+      onFilter: (value: string, record: any) => (
         record[dataIndex]
           .toString()
           .toLowerCase()
-          .includes(value.toLowerCase()),
+          .includes(value.toLowerCase())
+      ),
       onFilterDropdownVisibleChange: (visible: boolean) => {
         if (visible) {
           setTimeout(() => this.searchInput && this.searchInput.select());
@@ -153,23 +143,25 @@ class NotificationsC extends React.Component<IProps, IState> {
           highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
           searchWords={[this.state.searchText]}
           autoEscape={true}
-          textToHighlight={(text) ? text.toString() : ''}
+          textToHighlight={text.toString()}
         />
-      ),
+      )
     };
   }
 
-  private handleSearch(selectedKeys: string[], confirm: () => {}) {
+  private handleSearch = (selectedKeys: string[], confirm: () => void) => () => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
   }
 
-  private handleReset(clearFilters: () => void) {
+  private onSetSelectedKeys = (setSelectedKeys: (event: any[]) => void) => (e: any) => setSelectedKeys(e.target.value ? [e.target.value] : []);
+
+  private handleReset = (clearFilters: () => void) => () => {
     clearFilters();
     this.setState({ searchText: '' });
   }
 
-  private getColumns() {
+  private getColumns = () => {
     const columns: IColumn[] = [
       {
         title: 'Username',
@@ -197,7 +189,7 @@ class NotificationsC extends React.Component<IProps, IState> {
         dataIndex: 'amountString',
         key: 'amount',
         sorter: (a: INotificationTransformed, b: INotificationTransformed) => (a.amount - b.amount),
-        ...this.getColumnSearchProps('amountString'),
+        ...this.getColumnSearchProps('amount'),
       },
       {
         title: 'Date',
@@ -216,7 +208,7 @@ class NotificationsC extends React.Component<IProps, IState> {
     return columns;
   }
 
-  private async replay(index: number) {
+  private replay = (index: number) => async () => {
     const { notifications } = this.props;
 
     try {
@@ -233,12 +225,14 @@ class NotificationsC extends React.Component<IProps, IState> {
     }
   }
 
-  private dataTransformer(data: INotification, index: number) {
+  private dataTransformer = (data: INotification, index: number) => {
     return {
       ...data,
+      title: data.request || '',
+      message: data.message || '',
       date: moment(data.timestamp).fromNow(),
       amountString: numeral(data.amount).format('0.00$'),
-      replay: <Icon onClick={this.onReplay(index)} type="redo" style={{ color: '#108ee9' }} />,
+      replay: <Icon onClick={this.replay(index)} type="redo" style={{ color: '#108ee9' }} />,
       key: index
     };
   }
@@ -254,7 +248,7 @@ class NotificationsC extends React.Component<IProps, IState> {
           {!notifications.isFetching && !notifications.error && <div>
             <h1>Feed</h1>
             <p>Content homie</p>
-            <Table className={style.notificationsTable} dataSource={notifications.data.map(this.bindDataTransformer())} columns={this.getColumns()} />;
+            <Table className={style.notificationsTable} dataSource={notifications.data.map(this.dataTransformer)} columns={this.getColumns()} />;
           </div>}
         </Card>
       </Content>
