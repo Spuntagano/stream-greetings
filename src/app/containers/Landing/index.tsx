@@ -97,7 +97,7 @@ class LandingC extends React.Component<IProps, IState> {
             cover={
               <img
                 alt={request.title}
-                src={request.imageUrl || '/assets/images/placeholder.png'}
+                src={request.imageUrl || 'assets/images/placeholder.png'}
               />
             }
             hoverable={true}

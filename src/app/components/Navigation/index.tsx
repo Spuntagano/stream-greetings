@@ -6,12 +6,16 @@ import _ from 'lodash';
 
 const style = require('./style.scss');
 
-class NavigationC extends React.Component<RouteComponentProps> {
+interface IProps {
+  className?: string;
+}
+
+class NavigationC extends React.Component<IProps & RouteComponentProps> {
   public render() {
-    const { location } = this.props;
+    const { location, className } = this.props;
 
     return (
-      <div className={style.Navigation}>
+      <div className={`${style.Navigation} ${className}`}>
         <Menu selectedKeys={[location.pathname]} mode="horizontal">
           <Menu.Item key="/settings">
             <Link to={{
@@ -37,4 +41,4 @@ class NavigationC extends React.Component<RouteComponentProps> {
   }
 }
 
-export const Navigation = router(NavigationC as any);
+export const Navigation = router(NavigationC) as any;

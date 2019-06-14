@@ -184,4 +184,5 @@ fs.copySync('./src/favicon.ico', './build/public/favicon.ico');
 fs.copySync('./src/settings.html', './build/public/settings.html');
 fs.copySync('./src/source.html', './build/public/source.html');
 fs.copySync('./src/landing.html', './build/public/index.html');
+fs.copySync('./src/banner.png', './build/public/banner.png');
 fs.copySync('./src/assets', './build/public/assets');

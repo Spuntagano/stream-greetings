@@ -37,7 +37,7 @@ class SourceC extends React.Component<IProps, IState> {
       display: false
     };
 
-    this.sound = new Audio('/assets/audio/default.mp3');
+    this.sound = new Audio('assets/audio/default.mp3');
 
     this.websocket = new Websocket(props.env.WS_API_GATEWAY, this.onMessage);
   }
@@ -62,7 +62,7 @@ class SourceC extends React.Component<IProps, IState> {
     try {
       await getConfigs(dispatch);
       const settings = await getSettings(dispatch) as ISettings;
-      this.sound.src = `${(settings.notificationAudioUrl) ? settings.notificationAudioUrl : '/assets/audio/default.mp3'}`;
+      this.sound.src = `${(settings.notificationAudioUrl) ? settings.notificationAudioUrl : 'assets/audio/default.mp3'}`;
     } catch (e) {
       setTimeout(() => {
         location.reload();
@@ -140,7 +140,7 @@ class SourceC extends React.Component<IProps, IState> {
     return (
       <div className={style.source}>
         <div className={(this.state.display) ? style.sourceMessage : `${style.sourceMessage} ${style.sourceHide}`}>
-          {!!this.state.notifications.length && settings.data.showImage && <img src={`${(settings.data.notificationImageUrl) ? settings.data.notificationImageUrl : '/assets/images/default.png'}`} />}
+          {!!this.state.notifications.length && settings.data.showImage && <img src={`${(settings.data.notificationImageUrl) ? settings.data.notificationImageUrl : 'assets/images/default.png'}`} />}
           {!!this.state.notifications.length &&
             <div>
               Thank you <span className={style.sourceName}>{this.state.notifications[0].username}</span> for requesting <span className={style.sourceName}>{this.state.notifications[0].request}</span> for <span className={style.sourcePrice}>{this.state.notifications[0].amount}$</span> {(this.state.notifications[0].message) ? `Message: ${this.state.notifications[0].message}` : ''}

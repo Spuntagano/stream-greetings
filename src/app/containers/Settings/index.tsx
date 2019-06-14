@@ -155,6 +155,14 @@ class SettingsC extends React.Component<IProps, IState> {
     }
   }
 
+  private getBaseUrl() {
+    const loc = location.href.split('/');
+    loc.pop();
+    loc.pop();
+
+    return loc.join('/');
+  }
+
   public render() {
     const { settings, form, configs } = this.props;
 
@@ -183,7 +191,7 @@ class SettingsC extends React.Component<IProps, IState> {
                 </Form.Item>
                 <Form.Item label="Request page URL">
                   <Input ref={el => this.inputEl = el}
-                    value={`${location.origin}/#/${configs.data.profiles.streamlabs.name}`}
+                    value={`${this.getBaseUrl()}/index.html#/${configs.data.profiles.streamlabs.name}`}
                     addonAfter={<Icon type="copy" onClick={this.onCopy} />}
                     suffix={
                       <Tooltip title="This is the url where your viewers can make requests.

@@ -1,0 +1,35 @@
+{
+    "name": "Stream Requests",
+    "version": "2.0.0",
+    "buildPath": "build/public",
+    "supportedPlatforms": ["twitch", "youtube", "facebook", "mixer"],
+    "permissions": ["slobs.scenes-sources"],
+    "sources": [
+      {
+        "type": "browser_source",
+        "name": "Stream Requests",
+        "id": "stream_requests",
+        "about": {
+          "description": "Display incoming request alerts on your stream",
+          "bullets": [
+            "Incentivize viewers to use the app",
+            "Make you stream more interactive",
+            "Increase monetization"
+          ],
+          "bannerImage": "banner.png"
+        },
+        "file": "source.html",
+        "initialSize": {
+          "type": "relative",
+          "width": 1,
+          "height": 1
+        }
+      }
+    ],
+    "pages": [
+      {
+        "slot": "top_nav",
+        "file": "settings.html"
+      }
+    ]
+  }

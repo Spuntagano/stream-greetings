@@ -1,2 +1,15 @@
 .AppContainer {
+  .navigation {
+    width: calc(100% - 200px);
+    float: left;
+  }
+
+  .sourceLoaded {
+    width: 200px;
+    float: left;
+    text-align: center;
+    border-bottom: 1px solid #e8e8e8;
+    line-height: 63px;
+    height: 64px;
+  }
 }

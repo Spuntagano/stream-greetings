@@ -22,14 +22,27 @@ interface IProps {
 
 interface IState {
   loaded: boolean;
+  sourceLoaded: false;
+  theme: string;
+}
+
+interface IEvents {
+  [s: string]: string[];
 }
 
 class AppC extends React.Component<IProps, IState> {
+  private streamlabsOBS: any;
+  private sourcesQueue: any[];
+
   constructor(props: IProps) {
     super(props);
 
+    this.sourcesQueue = [];
+    this.streamlabsOBS = window.streamlabsOBS;
     this.state = {
-      loaded: false
+      loaded: false,
+      sourceLoaded: false,
+      theme: 'night'
     };
   }
 
@@ -46,6 +59,57 @@ class AppC extends React.Component<IProps, IState> {
         duration: 0
       });
     }
+
+    if (!this.streamlabsOBS) { return; }
+    this.streamlabsOBS.apiReady.then(() => {
+      this.streamlabsOBS.v1.Theme.getTheme().then((theme: any) => {
+        this.setState({ theme });
+      });
+
+      this.streamlabsOBS.v1.Theme.themeChanged((theme: any) => {
+        this.setState({ theme });
+      });
+
+      const events: IEvents = {
+        Sources: ['sourceAdded', 'sourceRemoved', 'sourceUpdated'],
+        Scenes: ['sceneAdded', 'sceneRemoved', 'sceneSwitched']
+      };
+
+      this.detectIfSourceIsInScene();
+      Object.keys(events).forEach((key: string) => {
+        events[key].forEach((event: string) => {
+          this.streamlabsOBS.v1[key][event](this.detectIfSourceIsInScene);
+        });
+      });
+    });
+  }
+
+  private detectIfSourceIsInScene = async () => {
+    const scene = await this.streamlabsOBS.v1.Scenes.getActiveScene();
+    const sources = await this.streamlabsOBS.v1.Sources.getAppSources();
+    let sourceLoaded = false;
+
+    this.nodeCrawler(scene.nodes);
+    this.sourcesQueue.forEach((node: any) => {
+      sources.forEach((source: any) => {
+        if (node.sourceId === source.id) {
+          sourceLoaded = true;
+        }
+      });
+    });
+
+    this.setState({ sourceLoaded });
+    this.sourcesQueue = [];
+  }
+
+  private async nodeCrawler(nodes: any[]) {
+    nodes.forEach(async (node: any) => {
+      if (node.type === 'folder') {
+        this.nodeCrawler(node);
+      } else if (node.type === 'scene_item') {
+        this.sourcesQueue.push(node);
+      }
+    });
   }
 
   public render() {
@@ -56,7 +120,9 @@ class AppC extends React.Component<IProps, IState> {
           backgroundColor: '#fff',
           padding: 0
         }}>
-        <Navigation />
+          <Navigation className={style.navigation} />
+          {this.state.sourceLoaded && <div className={style.sourceLoaded}>Source loaded</div>}
+          {!this.state.sourceLoaded && <div className={style.sourceLoaded}>Source not loaded</div>}
         </Header>
         <Layout className={style.container}>
           {renderRoutes(routes[0].routes)}

@@ -206,7 +206,7 @@ class RequestsC extends React.Component<IProps> {
         <Icon className={style.requestsAction} onClick={this.onDelete(index)} key="delete" type="delete" />
       ]}>
         <List.Item.Meta
-          avatar={<img style={{ width: '100%', maxWidth: '50px' }} alt={data.title} src={(data.imageUrl) ? data.imageUrl : '/assets/images/placeholder.png'} />}
+          avatar={<img style={{ width: '100%', maxWidth: '50px' }} alt={data.title} src={(data.imageUrl) ? data.imageUrl : 'assets/images/placeholder.png'} />}
           title={data.title}
           description={<LinesEllipsis
             text={data.description}
