@@ -5,11 +5,6 @@ export const routes = [
     component: App,
     routes: [
       {
-        path: '/',
-        exact: true,
-        component: Settings,
-      },
-      {
         path: '/settings',
         component: Settings,
       },

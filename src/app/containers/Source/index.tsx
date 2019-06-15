@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { INotification } from '../../redux/modules/notifications';
-import { ISettingsAction, getSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
+import { ISettingsAction, getSettings, ISettingsRequest, ISettings, receiveSettings } from '../../redux/modules/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
 import { Dispatch } from 'redux';
@@ -48,12 +48,17 @@ class SourceC extends React.Component<IProps, IState> {
     // todo: receive settings
     this.websocket.connect();
     window.Streamlabs.onMessage((event: MessageEvent) => {
+      const message = (typeof event.data === 'string') ? JSON.parse(event.data) : event.data;
+
       switch (event.type) {
         case 'replay':
           this.onMessage(event);
           break;
         case 'testNotification':
           this.onMessage(event);
+          break;
+        case 'settings':
+          receiveSettings(dispatch, message);
           break;
         default:
       }
@@ -74,9 +79,9 @@ class SourceC extends React.Component<IProps, IState> {
     this.websocket.disconnect();
   }
 
-  private onMessage = (evt: MessageEvent) => {
+  private onMessage = (event: MessageEvent) => {
     const { configs } = this.props;
-    const message = (typeof evt.data === 'string') ? JSON.parse(evt.data) : evt.data;
+    const message = (typeof event.data === 'string') ? JSON.parse(event.data) : event.data;
 
     if (message.streamer.toLowerCase() !== configs.data.profiles.streamlabs.name.toLowerCase()) { return; }
 

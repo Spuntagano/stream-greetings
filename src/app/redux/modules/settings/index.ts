@@ -25,6 +25,7 @@ export const GET_SETTINGS_SUCCESS = 'GET_SETTINGS_SUCCESS';
 export const SET_SETTINGS_SUCCESS = 'SET_SETTINGS_SUCCESS';
 export const GET_SETTINGS_FAILURE = 'GET_SETTINGS_FAILURE';
 export const SET_SETTINGS_FAILURE = 'SET_SETTINGS_FAILURE';
+export const RECEIVE_SETTINGS = 'RECEIVE_SETTINGS';
 
 export interface IActionGetSettingsRequest {
   type: typeof GET_SETTINGS_REQUEST;
@@ -54,8 +55,13 @@ export interface IActionSetSettingsFailure {
   message: string;
 }
 
+export interface IActionReceiveSettings {
+  type: typeof RECEIVE_SETTINGS;
+  data: ISettings;
+}
+
 export type ISettingsAction = IActionGetSettingsRequest | IActionGetSettingsSuccess | IActionGetSettingsFailure |
-  IActionSetSettingsRequest | IActionSetSettingsSuccess | IActionSetSettingsFailure;
+  IActionSetSettingsRequest | IActionSetSettingsSuccess | IActionSetSettingsFailure | IActionReceiveSettings;
 
 /** Initial State */
 const initialState: ISettingsRequest = {
@@ -119,6 +125,12 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
         message: action.message
       };
 
+    case RECEIVE_SETTINGS:
+      return {
+        ...state,
+        data: action.data
+      };
+
     default:
       return state;
   }
@@ -154,6 +166,11 @@ export function setSettings(dispatch: Dispatch<ISettingsAction>, data: ISettings
       reject(e);
     }
   });
+}
+
+/** Async Action Creator */
+export function receiveSettings(dispatch: Dispatch<ISettingsAction>, data: ISettings) {
+  dispatch(receiveSettingsAction(data));
 }
 
 /** Action Creator */
@@ -199,5 +216,13 @@ export function setSettingsFailure(message: string): IActionSetSettingsFailure {
   return {
     type: SET_SETTINGS_FAILURE,
     message,
+  };
+}
+
+/** Action Creator */
+export function receiveSettingsAction(data: ISettings): IActionReceiveSettings {
+  return {
+    type: RECEIVE_SETTINGS,
+    data,
   };
 }

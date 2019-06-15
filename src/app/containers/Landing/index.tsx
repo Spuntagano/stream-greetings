@@ -90,7 +90,7 @@ class LandingC extends React.Component<IProps, IState> {
       if (!request.active) { return null; }
 
       return (
-        <Col key={index} span={8}>
+        <Col key={index} span={6}>
           <Card
             actions={[<div key="request">See more</div>]}
             className={style.landingCard}

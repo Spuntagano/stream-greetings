@@ -40,7 +40,6 @@ interface IState {
 }
 
 class SettingsC extends React.Component<IProps, IState> {
-  private onSubmit: () => (e: React.FormEvent<any>) => void;
   private inputEl: Input | null;
   public jsEncrypt: any;
 
@@ -50,8 +49,6 @@ class SettingsC extends React.Component<IProps, IState> {
     this.jsEncrypt = new JSEncrypt();
     this.jsEncrypt.setPublicKey(atob(props.env.PUB_KEY));
     this.inputEl = null;
-
-    this.onSubmit = () => this.submit.bind(this);
   }
 
   public async componentDidMount() {
@@ -64,7 +61,7 @@ class SettingsC extends React.Component<IProps, IState> {
     });
   }
 
-  private async submit(e: React.FormEvent<any>) {
+  private submit = async (e: React.FormEvent<any>) => {
     const { dispatch, form } = this.props;
     e.preventDefault();
 
@@ -174,7 +171,7 @@ class SettingsC extends React.Component<IProps, IState> {
             {settings.error && <h2>Error loading settings</h2>}
             {!settings.isFetching && !settings.error && <div>
               <h1>Settings</h1>
-              <Form onSubmit={this.onSubmit()}>
+              <Form onSubmit={this.submit}>
                 <Form.Item label="Paypal Email">
                   {form.getFieldDecorator('paypalEmail', {
                     rules: [
