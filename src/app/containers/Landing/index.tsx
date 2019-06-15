@@ -35,6 +35,7 @@ interface IProps {
 interface IState {
   modalVisible: boolean;
   requestIndex: number;
+  submitting: boolean;
 }
 
 class LandingC extends React.Component<IProps, IState> {
@@ -45,7 +46,8 @@ class LandingC extends React.Component<IProps, IState> {
 
     this.state = {
       modalVisible: false,
-      requestIndex: 0
+      requestIndex: 0,
+      submitting: false
     };
 
     this.hiddenFormEl = null;
@@ -72,6 +74,7 @@ class LandingC extends React.Component<IProps, IState> {
       if (errors || !this.hiddenFormEl) { return; }
 
       this.hiddenFormEl.submit();
+      this.setState({ submitting: true });
     });
 
     return false;
@@ -212,17 +215,16 @@ class LandingC extends React.Component<IProps, IState> {
               visible={this.state.modalVisible}
               onCancel={this.handleCancel}
               footer={
-                <Button form="request-form-modal" key="submit" htmlType="submit" type="primary">
+                <Button loading={this.state.submitting} form="request-form-modal" key="submit" htmlType="submit" type="primary">
                   Request
-                </Button>
-              }
+                </Button>}
             >
               <strong>{numeral(infos.data.requests[this.state.requestIndex].amount).format('0.00$')}</strong>
               <p>{infos.data.requests[this.state.requestIndex].description}</p>
               {this.renderForm()}
               {this.renderHiddenForm()}
-        </Modal>}
-          </Content>}
+          </Modal>}
+        </Content>}
       </Layout>
     );
   }

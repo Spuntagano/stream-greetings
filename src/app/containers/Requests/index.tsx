@@ -34,6 +34,7 @@ interface IProps {
 interface IState {
   showFormModal: boolean;
   editIndex: number;
+  deleteIndex: number;
 }
 
 class RequestsC extends React.Component<IProps> {
@@ -44,7 +45,8 @@ class RequestsC extends React.Component<IProps> {
 
     this.state = {
       showFormModal: false,
-      editIndex: 0
+      editIndex: 0,
+      deleteIndex: 0
     };
   }
 
@@ -65,6 +67,7 @@ class RequestsC extends React.Component<IProps> {
         await setRequests(dispatch, form.getFieldsValue(), requests.data, this.state.editIndex);
 
         this.setState({ showFormModal: false });
+        form.resetFields();
         notification.open({
           message: 'Request saved',
           icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
@@ -83,6 +86,7 @@ class RequestsC extends React.Component<IProps> {
 
     try {
       if (!confirm(`Are you sure you want to delete ${requests.data[deleteIndex].title} ?`)) { return; }
+      this.setState({ deleteIndex });
       await deleteRequests(dispatch, requests.data, deleteIndex);
 
       notification.open({
@@ -200,11 +204,23 @@ class RequestsC extends React.Component<IProps> {
   }
 
   private renderListItem = (data: IRequest, index: number) => {
+    const { requests } = this.props;
+
+    const actions = [];
+    if (!requests.isDeleting || index !== this.state.deleteIndex) {
+      actions.push(<Icon key="edit" className={style.requestsAction} onClick={this.onFormModalShow(index)} type="edit" />);
+    }
+
+    if (!requests.isDeleting || index !== this.state.deleteIndex) {
+      actions.push(<Icon key="delete" className={style.requestsAction} onClick={this.onDelete(index)} type="delete" />);
+    }
+
+    if (requests.isDeleting && index === this.state.deleteIndex) {
+      actions.push(<Icon key="loading" className={style.requestsAction} type="loading" />);
+    }
+
     return (
-      <List.Item className={(!data.active) ? style.requestsInactive : ''} actions={[
-        <Icon className={style.requestsAction} onClick={this.onFormModalShow(index)} key="edit" type="edit" />,
-        <Icon className={style.requestsAction} onClick={this.onDelete(index)} key="delete" type="delete" />
-      ]}>
+      <List.Item className={(!data.active) ? style.requestsInactive : ''} actions={actions}>
         <List.Item.Meta
           avatar={<img style={{ width: '100%', maxWidth: '50px' }} alt={data.title} src={(data.imageUrl) ? data.imageUrl : 'assets/images/placeholder.png'} />}
           title={data.title}
@@ -236,7 +252,7 @@ class RequestsC extends React.Component<IProps> {
                 visible={this.state.showFormModal}
                 onCancel={this.onFormModalCancel}
                 footer={[
-                  <Button form="request-form-modal" key="submit" htmlType="submit" type="primary">
+                  <Button loading={requests.isSaving} form="request-form-modal" key="submit" htmlType="submit" type="primary">
                     Save
                   </Button>
                 ]}
