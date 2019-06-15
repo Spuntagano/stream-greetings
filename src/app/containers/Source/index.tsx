@@ -9,6 +9,7 @@ import { Dispatch } from 'redux';
 import { getConfigs, IConfigsRequest } from '../../redux/modules/configs';
 import Websocket from '../../lib/Websocket';
 import { IEnv } from '../../redux/modules/env';
+import { Notification } from '../../components/Notification';
 
 const style = require('./style.scss');
 
@@ -45,7 +46,6 @@ class SourceC extends React.Component<IProps, IState> {
   public async componentDidMount() {
     const { dispatch } = this.props;
 
-    // todo: receive settings
     this.websocket.connect();
     window.Streamlabs.onMessage((event: MessageEvent) => {
       const message = (typeof event.data === 'string') ? JSON.parse(event.data) : event.data;
@@ -144,13 +144,7 @@ class SourceC extends React.Component<IProps, IState> {
 
     return (
       <div className={style.source}>
-        <div className={(this.state.display) ? style.sourceMessage : `${style.sourceMessage} ${style.sourceHide}`}>
-          {!!this.state.notifications.length && settings.data.showImage && <img src={`${(settings.data.notificationImageUrl) ? settings.data.notificationImageUrl : 'assets/images/default.png'}`} />}
-          {!!this.state.notifications.length &&
-            <div>
-              Thank you <span className={style.sourceName}>{this.state.notifications[0].username}</span> for requesting <span className={style.sourceName}>{this.state.notifications[0].request}</span> for <span className={style.sourcePrice}>{this.state.notifications[0].amount}$</span> {(this.state.notifications[0].message) ? `Message: ${this.state.notifications[0].message}` : ''}
-            </div>}
-        </div>
+        <Notification notification={this.state.notifications[0]} settings={settings.data} display={this.state.display} />
       </div>
     );
   }

@@ -2,4 +2,28 @@
   .settingsCard {
     margin: 32px;
   }
+
+  .testNotificationUrl {
+    float: left;
+    width: calc(100% - 200px);
+    margin-right: 50px;
+  }
+
+  .testNotificationButton {
+    float: left;
+    width: 150px;
+    position: relative;
+    bottom: 1px;
+  }
+
+  .notificationPreview {
+    width: calc(65%);
+    float: right;
+    margin: 0 auto;
+    border: 1px solid #e8e8e8;
+    padding: 50px;
+    position: relative;
+    bottom: 550px;
+    transform: scale(0.70);
+  }
 }

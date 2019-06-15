@@ -107,11 +107,6 @@ class AudioUploadC extends React.Component<IProps, IState> {
 
         return (
             <div className={`${style.imageUpload} clearfix`}>
-                <div className={`${style.imageUploadLabel} ant-form-item-label`}>
-                    <label>
-                        Custom notification image
-                    </label>
-                </div>
                 <Upload
                     accept="audio/*"
                     listType="picture-card"

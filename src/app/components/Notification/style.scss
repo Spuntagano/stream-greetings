@@ -1,0 +1,22 @@
+.notification{
+  .sourceMessage {
+    font-family: 'Catamaran', sans-serif;
+    font-size: 4em;
+    line-height: 1;
+    text-shadow: 0 1px 3px #000;
+    color: #fff;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+    text-align: center;
+
+    .sourceName,
+    .sourceName,
+    .sourceAmount{
+      color: aqua;
+    }
+  }
+
+  .sourceHide {
+    opacity: 0;
+  }
+}

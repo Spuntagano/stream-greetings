@@ -20,6 +20,7 @@ import _ from 'lodash';
 import { INotification } from '../../redux/modules/notifications';
 import { IConfigsRequest } from '../../redux/modules/configs';
 import { IEnv } from '../../redux/modules/env';
+import { Notification } from '../../components/Notification';
 
 const { Content } = Layout;
 const style = require('./style.scss');
@@ -82,20 +83,24 @@ class SettingsC extends React.Component<IProps, IState> {
     }
   }
 
-  private testNotification = async () => {
+  private getTestNotification() {
     const { configs } = this.props;
 
-    try {
-      const testNotification: INotification = {
-        streamer: configs.data.profiles.streamlabs.name,
-        username: 'test user',
-        amount: 5,
-        message: 'test message',
-        request: 'test request',
-        timestamp: new Date().getDate()
-      };
+    const testNotification: INotification = {
+      streamer: configs.data.profiles.streamlabs.name,
+      username: 'test user',
+      amount: 5,
+      message: 'test message',
+      request: 'test request',
+      timestamp: new Date().getDate()
+    };
 
-      await window.Streamlabs.postMessage('testNotification', testNotification);
+    return testNotification;
+  }
+
+  private testNotification = async () => {
+    try {
+      await window.Streamlabs.postMessage('testNotification', this.getTestNotification());
       notification.open({
         message: 'Test notification sent',
         icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
@@ -163,6 +168,11 @@ class SettingsC extends React.Component<IProps, IState> {
   public render() {
     const { settings, form, configs } = this.props;
 
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 20 },
+    };
+
     return (
       <div className={style.Home}>
         <Content className={style.settings}>
@@ -171,8 +181,8 @@ class SettingsC extends React.Component<IProps, IState> {
             {settings.error && <h2>Error loading settings</h2>}
             {!settings.isFetching && !settings.error && <div>
               <h1>Settings</h1>
-              <Form onSubmit={this.submit}>
-                <Form.Item label="Paypal Email">
+              <Form onSubmit={this.submit} layout="horizontal">
+                <Form.Item label="Paypal Email" {...formItemLayout} >
                   {form.getFieldDecorator('paypalEmail', {
                     rules: [
                       {
@@ -186,10 +196,11 @@ class SettingsC extends React.Component<IProps, IState> {
                     ],
                   })(<Input />)}
                 </Form.Item>
-                <Form.Item label="Request page URL">
-                  <Input ref={el => this.inputEl = el}
+                <Form.Item {...formItemLayout} label="Request page URL">
+                  <Input className={style.testNotificationUrl} ref={el => this.inputEl = el}
                     value={`${this.getBaseUrl()}/index.html#/${configs.data.profiles.streamlabs.name}`}
-                    addonAfter={<Icon type="copy" onClick={this.onCopy} />}
+                    addonAfter={
+                      <Icon type="copy" onClick={this.onCopy} />}
                     suffix={
                       <Tooltip title="This is the url where your viewers can make requests.
                       You should link to this page on your Twitch page or Youtube description">
@@ -197,18 +208,18 @@ class SettingsC extends React.Component<IProps, IState> {
                       </Tooltip>
                     }
                   />
-                  <Button type="default" onClick={this.testNotification}>Test notification</Button>
+                  <Button className={style.testNotificationButton} type="default" onClick={this.testNotification}>Test notification</Button>
                 </Form.Item>
-                <Form.Item label="Show Image">
+                <Form.Item {...formItemLayout} label="Show Image">
                   {form.getFieldDecorator('showImage', { valuePropName: 'checked' })(<Switch />)}
                 </Form.Item>
-                <Form.Item label="Play Sound">
+                <Form.Item {...formItemLayout} label="Play Sound">
                   {form.getFieldDecorator('playSound', { valuePropName: 'checked' })(<Switch />)}
                 </Form.Item>
-                <Form.Item label="Profanity Filter">
+                <Form.Item {...formItemLayout} label="Profanity Filter">
                   {form.getFieldDecorator('profanityFilter', { valuePropName: 'checked' })(<Switch />)}
                 </Form.Item>
-                <Form.Item>
+                <Form.Item {...formItemLayout} label="Notification image">
                   <ImageUpload
                     imageKey="notificationImage"
                     onSubmit={this.onImageUpload}
@@ -216,13 +227,16 @@ class SettingsC extends React.Component<IProps, IState> {
                     imageUrl={settings.data.notificationImageUrl}
                   />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item {...formItemLayout} label="Notification sound">
                   <AudioUpload
                     audioKey="notificationAudio"
                     onSubmit={this.onAudioUpload}
                     onRemove={this.onAudioRemove}
                     audioUrl={settings.data.notificationAudioUrl} />
                 </Form.Item>
+                <div className={style.notificationPreview}>
+                  <Notification notification={this.getTestNotification()} settings={form.getFieldsValue()} display={true} />
+                </div>
                 {form.getFieldDecorator('notificationImageUrl')(<Input type="hidden" />)}
                 {form.getFieldDecorator('notificationAudioUrl')(<Input type="hidden" />)}
                 {form.getFieldDecorator('token')(<Input type="hidden" />)}
