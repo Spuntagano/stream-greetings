@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     jsEncrypt.setPrivateKey(Buffer.from(privKey, 'base64').toString());
 
     const getInfosParams = {
-        url: `https://platform.streamlabs.com/api/v1/developer/users/settings?usernames=${ipnContentCustom.streamer}&platform=twitch`,
+        url: `${process.env.STREAMLABS_APP_USERS_URL}?usernames=${ipnContentCustom.streamer}&platform=twitch`,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -80,14 +80,15 @@ exports.handler = async (event) => {
                 TableName: process.env.CONNECTIONS_TABLE_NAME
             }).promise();
 
-            connections.Items.forEach(async (connection) => {
-                await apigwManagementApi.postToConnection({
+            await Promise.all(connections.Items.map((connection) => {
+                return apigwManagementApi.postToConnection({
                     ConnectionId: connection.connectionId,
                     Data: JSON.stringify(request)
                 }).promise();
-            });
-
+            }));
+            
             await req.post(postNotificationsParams);
+
             resolve('Success');
         } catch (err) {
             console.error(err);

@@ -51,7 +51,7 @@ module.exports = (_env, argv) => {
                     PUB_KEY: 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFtR2NCd1JsMjZhUFIwcUN5NWJTNwo0SWxvTW5RWmhPWFZEWW9MRmk0QXJFY3BsR0VaMW9sK3QzNExFajhLenozbTJ6d0JNOEtTdlpDNGhCdklYRlRpCnpJdXpWNGVxVWlJaGZiSnB5NkFFSzBKZVVXSGM2SWlGenphVnVxQTUvQ3Z1aGJINUptSThzTXRNbE1SeFNGdk8KTVowMGoySDNwQUtOZ094NkNaQVpPck05ZC9LcmM5OU9GZnJIU2s2aWowcXU5bWVwdERPMWJ0RXhGZVVVZFBVOApySWRIcHl1YnU5NzNIdmF3dG1mYThWenhQaVE1Z0ptRSt4NlZmdFRPK0FFWG9kUTFtUlZzZTQ5R09IRWViMEtGCjM4SVVCSExqck9hQ2hLU04xVnN4UEcyRlZ3akpISFhVQUpJRm9ZNVBCWlM5SzdxN1JsQ1dxZkVDRy9YT3BxT3kKZkVFTSt5bWdIYmEwVCszVU9RMmZWandocytFeThjVDhJTkRxd3dNWjkzYjIrZU56dE9qTUZCeE81dHBTcEVsSwpZM2ZNNEk5bGgrKzdFbm9xdlJQSWM0dVU2QzFFUGMzWHlxSjZhZGhBd3J3cFlpUWhxNDFyWUJqMmJxaktpSlJ3CklKQjRUbkl2U1BidGJSb2tKRzRwVXhqdU9mWm1jb2owOTNhMzVhMGZzSFFFNEUzY0FoV3lOSU5rUjV0VFVFK2YKRUxNcTBGUzE5Z2hBUWx4Wkp3NlhVS2cwZHFhOHhwQWdubmdYYzU2bFd4QmtZcnNyMjN1ZVdTNGZ2NjN0YVh6dApPbFd3cWplMmNYN2FwSXZZRW1MTkcwTXFiTVRVcUU2Q05ycThpOHhjZzNGbFY1QmZueUwrNGxoMjVYNWZOYmd4CjEyS1NpNlNoQ1ZWSG9qdDZydU5qQ09zQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo='
                 }),
                 PRODUCTION: JSON.stringify({
-                    SL_API_GATEWAY_URL: 'https://pzuf486vz6.execute-api.us-east-1.amazonaws.com/production/',
+                    SL_API_GATEWAY_URL: 'https://9a6nphh3h5.execute-api.us-east-1.amazonaws.com/production',
                     PAYPAL_API_GATEWAY_URL: 'https://pzuf486vz6.execute-api.us-east-1.amazonaws.com/production/',
                     PAYPAL_PAYMENT_URL: 'https://www.paypal.com/cgi-bin/webscr',
                     WS_API_GATEWAY: 'wss://isn659gqka.execute-api.us-east-1.amazonaws.com/production',
