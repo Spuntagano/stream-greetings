@@ -7,6 +7,13 @@ export interface ISettings {
   profanityFilter: boolean;
   notificationImageUrl: string;
   notificationAudioUrl: string;
+  fontSize: number;
+  fontWeight: number;
+  lineHeight: number;
+  messageTemplate: string;
+  primaryColor: string;
+  secondaryColor: string;
+  fontFamily: string;
 }
 
 export interface ISettingsRequest {
@@ -74,7 +81,14 @@ const initialState: ISettingsRequest = {
     playSound: false,
     profanityFilter: false,
     notificationImageUrl: '',
-    notificationAudioUrl: ''
+    notificationAudioUrl: '',
+    fontSize: 24,
+    fontWeight: 400,
+    lineHeight: 1,
+    messageTemplate: 'Thank you {username} for requesting {request} for {amount}. {message}',
+    primaryColor: '#ffffff',
+    secondaryColor: '#00ffff',
+    fontFamily: 'arial'
   },
 };
 

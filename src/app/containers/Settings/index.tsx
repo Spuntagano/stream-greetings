@@ -11,6 +11,8 @@ import Form from 'antd/lib/form';
 import Layout from 'antd/lib/layout';
 import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
+import Slider from 'antd/lib/slider';
+import Select from 'antd/lib/select';
 import Tooltip from 'antd/lib/tooltip';
 import notification from 'antd/lib/notification';
 import { Spinner } from '../../components/Spinner';
@@ -21,8 +23,11 @@ import { INotification } from '../../redux/modules/notifications';
 import { IConfigsRequest } from '../../redux/modules/configs';
 import { IEnv } from '../../redux/modules/env';
 import { Notification } from '../../components/Notification';
+import TextArea from 'antd/lib/input/TextArea';
+import { ColorPicker } from '../../components/ColorPicker';
 
 const { Content } = Layout;
+const { Option } = Select;
 const style = require('./style.scss');
 
 interface IProps {
@@ -170,6 +175,11 @@ class SettingsC extends React.Component<IProps, IState> {
 
     const formItemLayout = {
       labelCol: { span: 4 },
+      wrapperCol: { span: 6 },
+    };
+
+    const formItemLayoutLong = {
+      labelCol: { span: 4 },
       wrapperCol: { span: 20 },
     };
 
@@ -182,7 +192,7 @@ class SettingsC extends React.Component<IProps, IState> {
             {!settings.isFetching && !settings.error && <div>
               <h1>Settings</h1>
               <Form onSubmit={this.submit} layout="horizontal">
-                <Form.Item label="Paypal Email" {...formItemLayout} >
+                <Form.Item label="Paypal Email" {...formItemLayoutLong} >
                   {form.getFieldDecorator('paypalEmail', {
                     rules: [
                       {
@@ -196,7 +206,7 @@ class SettingsC extends React.Component<IProps, IState> {
                     ],
                   })(<Input />)}
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="Request page URL">
+                <Form.Item {...formItemLayoutLong} label="Request page URL">
                   <Input className={style.testNotificationUrl} ref={el => this.inputEl = el}
                     value={`${this.getBaseUrl()}/index.html#/${configs.data.profiles.streamlabs.name}`}
                     addonAfter={
@@ -218,6 +228,48 @@ class SettingsC extends React.Component<IProps, IState> {
                 </Form.Item>
                 <Form.Item {...formItemLayout} label="Profanity Filter">
                   {form.getFieldDecorator('profanityFilter', { valuePropName: 'checked' })(<Switch />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Font size">
+                  {form.getFieldDecorator('fontSize')(<Slider
+                    min={8}
+                    max={60}
+                  />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Font weight">
+                  {form.getFieldDecorator('fontWeight')(<Slider
+                    min={100}
+                    max={700}
+                    step={100}
+                  />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Line height">
+                  {form.getFieldDecorator('lineHeight')(<Slider
+                    min={0.1}
+                    max={5}
+                    step={0.1}
+                  />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Primary color">
+                  {form.getFieldDecorator('primaryColor')(<ColorPicker />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Secondary color">
+                  {form.getFieldDecorator('secondaryColor')(<ColorPicker />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Font family">
+                  {form.getFieldDecorator('fontFamily')(
+                    <Select>
+                      <Option value="arial">Arial</Option>
+                      <Option value="roboto">Roboto</Option>
+                      <Option value="oswald">Oswald</Option>
+                      <Option value="montserrat">Montserrat</Option>
+                      <Option value="open sans">Open Sans</Option>
+                    </Select>
+                  )}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Message template">
+                  {form.getFieldDecorator('messageTemplate')(<TextArea
+                    autosize={{minRows: 5}}
+                   />)}
                 </Form.Item>
                 <Form.Item {...formItemLayout} label="Notification image">
                   <ImageUpload

@@ -21,3 +21,4 @@ import 'antd/lib/card/style';
 import 'antd/lib/input/style';
 import 'antd/lib/input-number/style';
 import 'antd/lib/upload/style';
+import 'antd/lib/slider/style';

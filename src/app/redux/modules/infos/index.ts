@@ -56,7 +56,14 @@ const initialState: IInfosRequest = {
       playSound: false,
       profanityFilter: false,
       notificationImageUrl: '',
-      notificationAudioUrl: ''
+      notificationAudioUrl: '',
+      fontSize: 24,
+      fontWeight: 400,
+      lineHeight: 1,
+      messageTemplate: 'Thank you {username} for requesting {request} for {amount}. {message}',
+      primaryColor: '#ffffff',
+      secondaryColor: '#00ffff',
+      fontFamily: 'arial'
     },
     requests: []
   }

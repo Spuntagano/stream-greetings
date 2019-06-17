@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { INotification } from '../../redux/modules/notifications';
 import { ISettings } from '../../redux/modules/settings';
+import numeral from 'numeral';
 import { CensorSensor } from 'censor-sensor';
 
 const style = require('./style.scss');
@@ -23,6 +24,10 @@ class NotificationC extends React.Component<IProps> {
     this.censor.enableTier(1);
   }
 
+  private encodeHTML(s: string) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
   public render() {
     const { settings, notification, display } = this.props;
 
@@ -40,12 +45,20 @@ class NotificationC extends React.Component<IProps> {
 
     return (
       <div className={style.notification}>
-        <div className={(display) ? style.sourceMessage : `${style.sourceMessage} ${style.sourceHide}`}>
+        <div className={(display) ? style.sourceMessage : `${style.sourceMessage} ${style.sourceHide}`} style={{
+            fontSize: settings.fontSize,
+            fontWeight: settings.fontWeight,
+            lineHeight: settings.lineHeight,
+            color: settings.primaryColor,
+            fontFamily: settings.fontFamily
+          }}>
           {notification && settings.showImage && <img src={`${(settings.notificationImageUrl) ? settings.notificationImageUrl : 'assets/images/default.png'}`} />}
-          {notification &&
-            <div>
-              Thank you <span className={style.sourceName}>{username}</span> for requesting <span className={style.sourceName}>{notification.request}</span> for <span className={style.sourcePrice}>{notification.amount}$</span> {(message) ? `Message: ${message}` : ''}
-            </div>}
+          {notification && settings.messageTemplate &&
+            <div dangerouslySetInnerHTML={{__html: this.encodeHTML(settings.messageTemplate)
+              .replace('{username}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(username)}</span>`)
+              .replace('{request}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(notification.request)}</span>`)
+              .replace('{amount}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(numeral(notification.amount).format('0.00$'))}</span>`)
+              .replace('{message}', this.encodeHTML(message))}} />}
         </div>
       </div>
     );
