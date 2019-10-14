@@ -4,3 +4,4 @@ export { Settings } from './Settings';
 export { Requests } from './Requests';
 export { Notifications } from './Notifications';
 export { Landing } from './Landing';
+export { Chatters } from './Chatters';

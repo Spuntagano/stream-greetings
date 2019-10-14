@@ -6,6 +6,7 @@ import { requestsReducer } from './modules/requests';
 import { notificationsReducer } from './modules/notifications';
 import { configsReducer } from './modules/configs';
 import { infosReducer } from './modules/infos';
+import { chattersReducer } from './modules/chatters';
 import { envReducer } from './modules/env';
 
 const rootReducer: Reducer<IStore> = combineReducers<IStore>({
@@ -15,6 +16,7 @@ const rootReducer: Reducer<IStore> = combineReducers<IStore>({
   notifications: notificationsReducer,
   configs: configsReducer,
   infos: infosReducer,
+  chatters: chattersReducer,
   env: envReducer
 });
 

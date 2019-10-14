@@ -13,7 +13,6 @@ import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
 import Slider from 'antd/lib/slider';
 import Select from 'antd/lib/select';
-import Tooltip from 'antd/lib/tooltip';
 import notification from 'antd/lib/notification';
 import { Spinner } from '../../components/Spinner';
 import { ImageUpload } from '../../components/ImageUpload';
@@ -46,7 +45,6 @@ interface IState {
 }
 
 class SettingsC extends React.Component<IProps, IState> {
-  private inputEl: Input | null;
   public jsEncrypt: any;
 
   constructor(props: IProps) {
@@ -54,7 +52,6 @@ class SettingsC extends React.Component<IProps, IState> {
 
     this.jsEncrypt = new JSEncrypt();
     this.jsEncrypt.setPublicKey(atob(props.env.PUB_KEY));
-    this.inputEl = null;
   }
 
   public async componentDidMount() {
@@ -89,14 +86,14 @@ class SettingsC extends React.Component<IProps, IState> {
   }
 
   private getTestNotification() {
-    const { configs } = this.props;
-
     const testNotification: INotification = {
-      streamer: configs.data.profiles.streamlabs.name,
-      username: 'test user',
-      amount: 5,
-      message: 'test message',
-      request: 'test request',
+      username: 'Spuntagano',
+      type: 'MESSAGE',
+      chatter: {
+        firstJoinedTimestamp: String(new Date().getDate()),
+        firstChatMessageTimestamp: String(new Date().getDate()),
+        firstChatMessage: 'Like the stream!'
+      },
       timestamp: new Date().getDate()
     };
 
@@ -150,37 +147,12 @@ class SettingsC extends React.Component<IProps, IState> {
     });
   }
 
-  private onCopy = () => {
-    if (this.inputEl) {
-      this.inputEl.select();
-      document.execCommand('copy');
-
-      notification.open({
-        message: 'URL copied to clipboard!',
-        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
-      });
-    }
-  }
-
-  private getBaseUrl() {
-    const loc = location.href.split('/');
-    loc.pop();
-    loc.pop();
-
-    return loc.join('/');
-  }
-
   public render() {
-    const { settings, form, configs } = this.props;
+    const { settings, form } = this.props;
 
     const formItemLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 6 },
-    };
-
-    const formItemLayoutLong = {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 20 },
     };
 
     return (
@@ -192,34 +164,6 @@ class SettingsC extends React.Component<IProps, IState> {
             {!settings.isFetching && !settings.error && <div>
               <h1>Settings</h1>
               <Form onSubmit={this.submit} layout="horizontal">
-                <Form.Item label="Paypal Email" {...formItemLayoutLong} >
-                  {form.getFieldDecorator('paypalEmail', {
-                    rules: [
-                      {
-                        type: 'email',
-                        message: 'The input is not valid E-mail!',
-                      },
-                      {
-                        required: true,
-                        message: 'Please input your E-mail!',
-                      },
-                    ],
-                  })(<Input />)}
-                </Form.Item>
-                <Form.Item {...formItemLayoutLong} label="Request page URL">
-                  <Input className={style.testNotificationUrl} ref={el => this.inputEl = el}
-                    value={`${this.getBaseUrl()}/index.html#/${configs.data.profiles.streamlabs.name}`}
-                    addonAfter={
-                      <Icon type="copy" onClick={this.onCopy} />}
-                    suffix={
-                      <Tooltip title="This is the url where your viewers can make requests.
-                      You should link to this page on your Twitch page or Youtube description">
-                        <Icon type="info-circle" style={{ color: 'rgba(0,0,0,.45)' }} />
-                      </Tooltip>
-                    }
-                  />
-                  <Button className={style.testNotificationButton} type="default" onClick={this.testNotification}>Test notification</Button>
-                </Form.Item>
                 <Form.Item {...formItemLayout} label="Show Image">
                   {form.getFieldDecorator('showImage', { valuePropName: 'checked' })(<Switch />)}
                 </Form.Item>
@@ -228,6 +172,12 @@ class SettingsC extends React.Component<IProps, IState> {
                 </Form.Item>
                 <Form.Item {...formItemLayout} label="Profanity Filter">
                   {form.getFieldDecorator('profanityFilter', { valuePropName: 'checked' })(<Switch />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Show New Viewer Notification">
+                  {form.getFieldDecorator('showFirstJoinedNotification', { valuePropName: 'checked' })(<Switch />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="Show First Chat Message Notification">
+                  {form.getFieldDecorator('showFirstChatMessageNotification', { valuePropName: 'checked' })(<Switch />)}
                 </Form.Item>
                 <Form.Item {...formItemLayout} label="Font size">
                   {form.getFieldDecorator('fontSize')(<Slider
@@ -266,8 +216,13 @@ class SettingsC extends React.Component<IProps, IState> {
                     </Select>
                   )}
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="Message template">
-                  {form.getFieldDecorator('messageTemplate')(<TextArea
+                <Form.Item {...formItemLayout} label="First Joined Message template">
+                  {form.getFieldDecorator('firstJoinedMessageTemplate')(<TextArea
+                    autosize={{minRows: 5}}
+                   />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="First Time Chatting Message template">
+                  {form.getFieldDecorator('firstMessageMessageTemplate')(<TextArea
                     autosize={{minRows: 5}}
                    />)}
                 </Form.Item>
@@ -294,6 +249,7 @@ class SettingsC extends React.Component<IProps, IState> {
                 {form.getFieldDecorator('token')(<Input type="hidden" />)}
                 <Form.Item>
                   <Button type="primary" htmlType="submit" loading={settings.isSaving}>Save settings</Button>
+                  <Button className={style.testNotificationButton} type="default" onClick={this.testNotification}>Test notification</Button>
                 </Form.Item>
               </Form>
             </div>}

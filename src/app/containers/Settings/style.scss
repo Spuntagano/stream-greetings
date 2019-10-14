@@ -3,17 +3,8 @@
     margin: 32px;
   }
 
-  .testNotificationUrl {
-    float: left;
-    width: calc(100% - 200px);
-    margin-right: 50px;
-  }
-
   .testNotificationButton {
-    float: left;
-    width: 150px;
-    position: relative;
-    bottom: 1px;
+    margin-left: 30px;
   }
 
   .notificationPreview {
@@ -23,7 +14,7 @@
     border: 1px solid #e8e8e8;
     padding: 50px;
     position: relative;
-    bottom: 550px;
+    bottom: 1050px;
     transform: scale(0.70);
   }
 }

@@ -23,11 +23,11 @@ class NavigationC extends React.Component<IProps & RouteComponentProps> {
               search: location.search
             }}>Settings</Link>
           </Menu.Item>
-          <Menu.Item key="/requests">
+          <Menu.Item key="/chatters">
             <Link to={{
-              pathname: '/requests',
+              pathname: '/chatters',
               search: location.search
-            }}>Requests</Link>
+            }}>Chatters</Link>
           </Menu.Item>
           <Menu.Item key="/feed">
             <Link to={{

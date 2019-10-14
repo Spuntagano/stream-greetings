@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { INotification } from '../../redux/modules/notifications';
 import { ISettings } from '../../redux/modules/settings';
-import numeral from 'numeral';
 import { CensorSensor } from 'censor-sensor';
 
 const style = require('./style.scss');
@@ -33,13 +32,23 @@ class NotificationC extends React.Component<IProps> {
 
     let username = '';
     let message = '';
+    let messageTemplate = '';
     if (notification) {
       username = notification.username;
-      message = notification.message;
+      message = notification.chatter.firstChatMessage || '';
 
       if (settings.profanityFilter) {
         username = this.censor.cleanProfanity(username);
         message = this.censor.cleanProfanity(message);
+      }
+
+      switch (notification.type) {
+        case 'JOIN':
+          messageTemplate = settings.firstJoinedMessageTemplate;
+          break;
+        case 'MESSAGE':
+          messageTemplate = settings.firstMessageMessageTemplate;
+          break;
       }
     }
 
@@ -53,11 +62,9 @@ class NotificationC extends React.Component<IProps> {
             fontFamily: settings.fontFamily
           }}>
           {notification && settings.showImage && <img src={`${(settings.notificationImageUrl) ? settings.notificationImageUrl : 'assets/images/default.png'}`} />}
-          {notification && settings.messageTemplate &&
-            <div dangerouslySetInnerHTML={{__html: this.encodeHTML(settings.messageTemplate)
+          {notification && messageTemplate &&
+            <div dangerouslySetInnerHTML={{__html: this.encodeHTML(messageTemplate)
               .replace('{username}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(username)}</span>`)
-              .replace('{request}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(notification.request)}</span>`)
-              .replace('{amount}', `<span style="color: ${settings.secondaryColor}">${this.encodeHTML(numeral(notification.amount).format('0.00$'))}</span>`)
               .replace('{message}', this.encodeHTML(message))}} />}
         </div>
       </div>

@@ -168,7 +168,6 @@ class LandingC extends React.Component<IProps, IState> {
 
     return (
       <form ref={el => this.hiddenFormEl = el} action={env.PAYPAL_PAYMENT_URL} method="post">
-        <input type="hidden" name="business" value={infos.data.settings.paypalEmail} />
         <input type="hidden" name="cmd" value="_xclick" />
         <input type="hidden" name="notify_url" value={env.PAYPAL_API_GATEWAY_URL} />
         <input type="hidden" name="item_name" value={infos.data.requests[this.state.requestIndex].title} />

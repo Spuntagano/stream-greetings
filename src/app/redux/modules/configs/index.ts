@@ -5,9 +5,16 @@ export interface IStreamlabs {
   name: string;
 }
 
+export interface ITwitch {
+  twitch_id: string;
+  display_name: string;
+  name: string;
+}
+
 export interface IProfiles {
   primary: string;
   streamlabs: IStreamlabs;
+  twitch: ITwitch;
 }
 
 export interface IConfigs {
@@ -54,6 +61,11 @@ const initialState: IConfigsRequest = {
       primary: 'twitch',
       streamlabs: {
         id: 0,
+        name: ''
+      },
+      twitch: {
+        twitch_id: '',
+        display_name: '',
         name: ''
       }
     },

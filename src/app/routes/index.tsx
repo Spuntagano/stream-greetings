@@ -1,4 +1,4 @@
-import { App, Settings, Requests, Notifications } from '../containers';
+import { App, Settings, Chatters, Notifications } from '../containers';
 
 export const routes = [
   {
@@ -9,8 +9,8 @@ export const routes = [
         component: Settings,
       },
       {
-        path: '/requests',
-        component: Requests,
+        path: '/chatters',
+        component: Chatters,
       },
       {
         path: '/feed',

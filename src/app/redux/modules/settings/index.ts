@@ -1,16 +1,18 @@
 import { Dispatch } from 'redux';
 
 export interface ISettings {
-  paypalEmail: string;
   showImage: boolean;
   playSound: boolean;
   profanityFilter: boolean;
+  showFirstJoinedNotification: boolean;
+  showFirstChatMessageNotification: boolean;
   notificationImageUrl: string;
   notificationAudioUrl: string;
   fontSize: number;
   fontWeight: number;
   lineHeight: number;
-  messageTemplate: string;
+  firstJoinedMessageTemplate: string;
+  firstMessageMessageTemplate: string;
   primaryColor: string;
   secondaryColor: string;
   fontFamily: string;
@@ -76,16 +78,18 @@ const initialState: ISettingsRequest = {
   isLoaded: false,
   isSaving: false,
   data: {
-    paypalEmail: '',
-    showImage: false,
-    playSound: false,
-    profanityFilter: false,
+    showImage: true,
+    playSound: true,
+    profanityFilter: true,
+    showFirstJoinedNotification: false,
+    showFirstChatMessageNotification: false,
     notificationImageUrl: '',
     notificationAudioUrl: '',
     fontSize: 24,
     fontWeight: 400,
     lineHeight: 1,
-    messageTemplate: 'Thank you {username} for requesting {request} for {amount}. {message}',
+    firstJoinedMessageTemplate: 'Thank you {username} for watching my stream for the first time!',
+    firstMessageMessageTemplate: 'Thank you {username} for the first time typing in my chat with message: {message}',
     primaryColor: '#ffffff',
     secondaryColor: '#00ffff',
     fontFamily: 'arial'

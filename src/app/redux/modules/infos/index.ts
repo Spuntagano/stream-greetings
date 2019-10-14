@@ -48,19 +48,26 @@ const initialState: IInfosRequest = {
       streamlabs: {
         id: 0,
         name: ''
+      },
+      twitch: {
+        twitch_id: '',
+        display_name: '',
+        name: ''
       }
     },
     settings: {
-      paypalEmail: '',
-      showImage: false,
-      playSound: false,
-      profanityFilter: false,
+      showImage: true,
+      playSound: true,
+      profanityFilter: true,
+      showFirstJoinedNotification: false,
+      showFirstChatMessageNotification: false,
       notificationImageUrl: '',
       notificationAudioUrl: '',
       fontSize: 24,
       fontWeight: 400,
       lineHeight: 1,
-      messageTemplate: 'Thank you {username} for requesting {request} for {amount}. {message}',
+      firstJoinedMessageTemplate: 'Thank you {username} for watching my stream for the first time!',
+      firstMessageMessageTemplate: 'Thank you {username} for the first time typing in my chat with message: {message}',
       primaryColor: '#ffffff',
       secondaryColor: '#00ffff',
       fontFamily: 'arial'

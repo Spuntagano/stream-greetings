@@ -1,7 +1,7 @@
 {
-  "name": "stream-requests",
-  "version": "2.0.0",
-  "description": "Live requests on stream",
+  "name": "stream-greetings",
+  "version": "1.0.0",
+  "description": "Live greetings on stream",
   "main": "build/server.js",
   "scripts": {
     "clean": "rimraf build",

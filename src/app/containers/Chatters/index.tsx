@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { INotificationsRequest, INotificationsAction, getNotifications, INotification, addNotification } from '../../redux/modules/notifications';
+import moment from 'moment';
+import { IChattersRequest, IChattersAction, getChatters } from '../../redux/modules/chatters';
 import { IStore } from '../../redux/IStore';
 import Layout from 'antd/lib/layout';
 import Table from 'antd/lib/table';
@@ -11,9 +12,7 @@ import Button from 'antd/lib/button';
 import Highlighter from 'react-highlight-words';
 import { Spinner } from '../../components';
 import _ from 'lodash';
-import moment from 'moment';
 import Icon from 'antd/lib/icon';
-import notification from 'antd/lib/notification';
 import { IConfigsRequest } from '../../redux/modules/configs';
 import { IEnv } from '../../redux/modules/env';
 
@@ -21,7 +20,7 @@ const { Content } = Layout;
 const style = require('./style.scss');
 
 interface IProps {
-  notifications: INotificationsRequest;
+  chatters: IChattersRequest;
   configs: IConfigsRequest;
   dispatch: Dispatch;
   form: any;
@@ -43,21 +42,21 @@ interface IColumn {
   title: string;
   dataIndex: string;
   key: string;
-  sorter?: (a: INotificationTransformed, b: INotificationTransformed) => number;
+  sorter?: (a: IChatterTransformed, b: IChatterTransformed) => number;
   className?: string;
 }
 
-interface INotificationTransformed {
-  type: string;
-  message: string;
+interface IChatterTransformed {
   username: string;
-  timestamp: number;
-  date: string;
-  replay?: React.ReactElement<any>;
-  key: number;
+  firstJoinedTimestamp: string;
+  firstChatMessage: string;
+  firstChatMessageTimestamp: string;
+  firstChatMessageDate: string;
+  firstJoinedDate: string;
+  key: string;
 }
 
-class NotificationsC extends React.Component<IProps, IState> {
+class ChattersC extends React.Component<IProps, IState> {
   private searchInput: Input | null;
   constructor(props: IProps) {
     super(props);
@@ -69,18 +68,9 @@ class NotificationsC extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, configs } = this.props;
 
-    getNotifications(dispatch);
-    window.Streamlabs.onMessage(this.onMessage);
-  }
-
-  private onMessage = (event: MessageEvent) => {
-    const { dispatch } = this.props;
-
-    if (event.type === 'NOTIFICATION') {
-      addNotification(dispatch, event.data);
-    }
+    getChatters(dispatch, configs.data.profiles.twitch.name);
   }
 
   private getColumnSearchProps = (dataIndex: string) => {
@@ -130,7 +120,7 @@ class NotificationsC extends React.Component<IProps, IState> {
           highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
           searchWords={[this.state.searchText]}
           autoEscape={true}
-          textToHighlight={text.toString()}
+          textToHighlight={(text || '').toString()}
         />
       )
     };
@@ -151,94 +141,75 @@ class NotificationsC extends React.Component<IProps, IState> {
   private getColumns = () => {
     const columns: IColumn[] = [
       {
-        title: 'Type',
-        dataIndex: 'type',
-        key: 'type',
-        sorter: (a: INotificationTransformed, b: INotificationTransformed) => (a.type.localeCompare(b.type)),
-        ...this.getColumnSearchProps('type'),
-      },
-      {
         title: 'Username',
         dataIndex: 'username',
         key: 'username',
-        sorter: (a: INotificationTransformed, b: INotificationTransformed) => (a.username.localeCompare(b.username)),
+        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (a.username.localeCompare(b.username)),
         ...this.getColumnSearchProps('username'),
       },
       {
-        title: 'Message',
-        dataIndex: 'message',
-        key: 'message',
-        sorter: (a: INotificationTransformed, b: INotificationTransformed) => (a.message.localeCompare(b.message)),
-        ...this.getColumnSearchProps('message'),
+        title: 'First Joined Date',
+        dataIndex: 'firstJoinedDate',
+        key: 'firstJoinedDate',
+        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt(b.firstJoinedTimestamp, 10) - parseInt(a.firstJoinedTimestamp, 10))
       },
       {
-        title: 'Date',
-        dataIndex: 'date',
-        key: 'date',
-        sorter: (a: INotificationTransformed, b: INotificationTransformed) => (b.timestamp - a.timestamp)
+        title: 'First Chat Message Date',
+        dataIndex: 'firstChatMessageDate',
+        key: 'firstChatMessageDate',
+        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt((b.firstChatMessageTimestamp), 10) - parseInt((a.firstChatMessageTimestamp), 10))
       },
       {
-        title: 'Replay',
-        dataIndex: 'replay',
-        key: 'replay',
-        className: style.notificationsReplay
+        title: 'First Chat Message',
+        dataIndex: 'firstChatMessage',
+        key: 'firstChatMessage',
+        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (a.firstChatMessage).localeCompare(b.firstChatMessage),
+        ...this.getColumnSearchProps('firstChatMessage'),
       }
     ];
 
     return columns;
   }
 
-  private replay = (index: number) => async () => {
-    const { notifications } = this.props;
+  private dataTransformer = (username: string) => {
+    const { chatters } = this.props;
 
-    try {
-      await window.Streamlabs.postMessage('replay', notifications.data[index]);
-      notification.open({
-        message: 'Notification replay sent',
-        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
-      });
-    } catch (e) {
-      notification.open({
-        message: 'An error as occured',
-        icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
-      });
-    }
-  }
-
-  private dataTransformer = (data: INotification, index: number) => {
     return {
-      ...data,
-      message: (data.chatter && data.chatter.firstChatMessage) ? data.chatter.firstChatMessage : '',
-      date: moment(data.timestamp).fromNow(),
-      replay: <Icon onClick={this.replay(index)} type="redo" style={{ color: '#108ee9' }} />,
-      key: index
+      username,
+      firstJoinedDate: moment(parseInt((chatters.data[username].firstJoinedTimestamp || ''), 10)).fromNow(),
+      firstChatMessageDate: (chatters.data[username].firstChatMessageTimestamp) ?
+              moment(parseInt((chatters.data[username].firstChatMessageTimestamp || ''), 10)).fromNow() : '',
+      firstChatMessage: chatters.data[username].firstChatMessage || '',
+      firstJoinedTimestamp: chatters.data[username].firstJoinedTimestamp || '0',
+      firstChatMessageTimestamp: chatters.data[username].firstChatMessageTimestamp || '0',
+      key: username
     };
   }
 
   public render() {
-    const { notifications } = this.props;
+    const { chatters } = this.props;
 
     return (
-      <Content className={style.notifications}>
-        <Card className={style.notificationsCard}>
-          {notifications.isFetching && <Spinner />}
-          {notifications.error && <h2>Error loading notifications</h2>}
-          {!notifications.isFetching && !notifications.error && <div>
-            <h1>Feed</h1>
-            <Table className={style.notificationsTable} dataSource={notifications.data.map(this.dataTransformer)} columns={this.getColumns()} />;
+      <Content className={style.chatters}>
+        <Card className={style.chattersCard}>
+          {chatters.isFetching && <Spinner />}
+          {chatters.error && <h2>Error loading chatters</h2>}
+          {!chatters.isFetching && !chatters.error && <div>
+            <h1>Chatters</h1>
+            <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.dataTransformer)} columns={this.getColumns()} />;
           </div>}
         </Card>
       </Content>
     );
   }
 }
-export const Notifications = connect(
+export const Chatters = connect(
   (state: IStore) => {
     return {
-      notifications: state.notifications,
+      chatters: state.chatters,
       configs: state.configs,
       env: state.env
     };
   },
-  (d: Dispatch<INotificationsAction>) => ({ dispatch: d })
-)(NotificationsC as any);
+  (d: Dispatch<IChattersAction>) => ({ dispatch: d })
+)(ChattersC as any);
