@@ -34,7 +34,7 @@
     "max-line-length": [
       true, 
       {
-        "limit": 160, 
+        "limit": 180, 
         "ignore-pattern": "http(s)://"
       }
     ]

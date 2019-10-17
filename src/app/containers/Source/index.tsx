@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { INotification, setNotifications, INotificationsRequest, getNotifications } from '../../redux/modules/notifications';
-import { ISettingsAction, getSettings, ISettingsRequest, ISettings, /* receiveSettings */ } from '../../redux/modules/settings';
+import { ISettingsAction, getSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
 import { Dispatch } from 'redux';
@@ -79,8 +79,12 @@ class SourceC extends React.Component<IProps, IState> {
     try {
       const settings = await getSettings(dispatch) as ISettings;
       const configs = await getConfigs(dispatch);
-      await getNotifications(dispatch);
       await getChatters(dispatch, configs.profiles.twitch.name);
+      await getNotifications(dispatch);
+      this.fetchLiveChatters();
+      window.Streamlabs.onChatMessage(this.onChatMessage);
+      window.Streamlabs.twitch.initTwitchChat();
+      this.liveChattersFetchInterval = setInterval(this.fetchLiveChatters, 60000);
 
       this.sound.src = `${(settings.notificationAudioUrl) ? settings.notificationAudioUrl : 'assets/audio/default.mp3'}`;
     } catch (e) {
@@ -88,12 +92,6 @@ class SourceC extends React.Component<IProps, IState> {
         location.reload();
       }, 10000);
     }
-
-    window.Streamlabs.onChatMessage(this.onChatMessage);
-    window.Streamlabs.twitch.initTwitchChat();
-
-    this.fetchLiveChatters();
-    this.liveChattersFetchInterval = setInterval(this.fetchLiveChatters, 60000);
   }
 
   public componentWillUnmount() {

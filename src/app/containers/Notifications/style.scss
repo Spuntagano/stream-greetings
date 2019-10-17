@@ -1,4 +1,16 @@
 .notifications {
+  .titleContainer {
+    margin-bottom: 15px;
+
+    .title {
+      display: inline-block;
+    }
+
+    .clearNotificationButton {
+      float: right;
+    }
+  }
+
   .notificationsCard {
     margin: 32px;
   }

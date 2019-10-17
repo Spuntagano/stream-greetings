@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { INotificationsRequest, INotificationsAction, getNotifications, INotification, addNotification } from '../../redux/modules/notifications';
+import { INotificationsRequest, INotificationsAction, getNotifications, INotification, addNotification, deleteNotifications } from '../../redux/modules/notifications';
 import { IStore } from '../../redux/IStore';
 import Layout from 'antd/lib/layout';
 import Table from 'antd/lib/table';
@@ -130,7 +130,7 @@ class NotificationsC extends React.Component<IProps, IState> {
           highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
           searchWords={[this.state.searchText]}
           autoEscape={true}
-          textToHighlight={text.toString()}
+          textToHighlight={(text || '').toString()}
         />
       )
     };
@@ -215,6 +215,11 @@ class NotificationsC extends React.Component<IProps, IState> {
     };
   }
 
+  private clearNotification = () => {
+    const { dispatch } = this.props;
+    deleteNotifications(dispatch);
+  }
+
   public render() {
     const { notifications } = this.props;
 
@@ -224,7 +229,10 @@ class NotificationsC extends React.Component<IProps, IState> {
           {notifications.isFetching && <Spinner />}
           {notifications.error && <h2>Error loading notifications</h2>}
           {!notifications.isFetching && !notifications.error && <div>
-            <h1>Feed</h1>
+            <div className={style.titleContainer}>
+              <h1 className={style.title}>Feed</h1>
+              <Button className={style.clearNotificationButton} type="default" onClick={this.clearNotification}>Clear notifications</Button>
+            </div>
             <Table className={style.notificationsTable} dataSource={notifications.data.map(this.dataTransformer)} columns={this.getColumns()} />;
           </div>}
         </Card>

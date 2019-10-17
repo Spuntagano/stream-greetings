@@ -23,6 +23,9 @@ export const GET_NOTIFICATIONS_FAILURE = 'GET_NOTIFICATIONS_FAILURE';
 export const SET_NOTIFICATIONS_REQUEST = 'SET_NOTIFICATIONS_REQUEST';
 export const SET_NOTIFICATIONS_SUCCESS = 'SET_NOTIFICATIONS_SUCCESS';
 export const SET_NOTIFICATIONS_FAILURE = 'SET_NOTIFICATIONS_FAILURE';
+export const DELETE_NOTIFICATIONS_REQUEST = 'DELETE_NOTIFICATIONS_REQUEST';
+export const DELETE_NOTIFICATIONS_SUCCESS = 'DELETE_NOTIFICATIONS_SUCCESS';
+export const DELETE_NOTIFICATIONS_FAILURE = 'DELETE_NOTIFICATIONS_FAILURE';
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 
 export interface IActionGetNotificationsRequest {
@@ -53,13 +56,27 @@ export interface IActionSetNotificationsFailure {
   message: string;
 }
 
+export interface IActionDeleteNotificationsRequest {
+  type: typeof DELETE_NOTIFICATIONS_REQUEST;
+}
+
+export interface IActionDeleteNotificationsSuccess {
+  type: typeof DELETE_NOTIFICATIONS_SUCCESS;
+}
+
+export interface IActionDeleteNotificationsFailure {
+  type: typeof DELETE_NOTIFICATIONS_FAILURE;
+  message: string;
+}
+
 export interface IActionAddNotification {
   type: typeof ADD_NOTIFICATION;
   notification: INotification;
 }
 
 export type INotificationsAction = IActionGetNotificationsRequest | IActionGetNotificationsSuccess | IActionGetNotificationsFailure | IActionAddNotification |
-            IActionSetNotificationsRequest | IActionSetNotificationsSuccess | IActionSetNotificationsFailure;
+            IActionSetNotificationsRequest | IActionSetNotificationsSuccess | IActionSetNotificationsFailure | IActionDeleteNotificationsRequest |
+            IActionDeleteNotificationsSuccess | IActionDeleteNotificationsFailure;
 
 /** Initial State */
 const initialState: INotificationsRequest = {
@@ -83,6 +100,12 @@ export function notificationsReducer(state = initialState, action: INotification
         isSaving: true
       };
 
+    case DELETE_NOTIFICATIONS_REQUEST:
+      return {
+        ...state,
+        isDeleting: true
+      };
+
     case GET_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
@@ -100,6 +123,14 @@ export function notificationsReducer(state = initialState, action: INotification
         error: false
       };
 
+    case DELETE_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        isDeleting: false,
+        data: [],
+        error: false
+      };
+
     case GET_NOTIFICATIONS_FAILURE:
       return {
         ...state,
@@ -112,6 +143,13 @@ export function notificationsReducer(state = initialState, action: INotification
       return {
         ...state,
         isSaving: false,
+        message: action.message
+      };
+
+    case DELETE_NOTIFICATIONS_FAILURE:
+      return {
+        ...state,
+        isDeleting: false,
         message: action.message
       };
 
@@ -154,12 +192,29 @@ export function setNotifications(dispatch: Dispatch<INotificationsAction>, data:
 
   return new Promise(async (resolve, reject) => {
     try {
-      const notifications = await window.Streamlabs.userSettings.set('notifications', newData);
+      await window.Streamlabs.userSettings.set('notifications', newData);
 
-      dispatch(setNotificationsSuccess(notifications));
-      resolve(notifications);
+      dispatch(setNotificationsSuccess(newData));
+      resolve(newData);
     } catch (e) {
       dispatch(setNotificationsFailure(e.message));
+      reject(e);
+    }
+  });
+}
+
+/** Async Action Creator */
+export function deleteNotifications(dispatch: Dispatch<INotificationsAction>) {
+  dispatch(deleteNotificationsRequest());
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      await window.Streamlabs.userSettings.delete('notifications');
+
+      dispatch(deleteNotificationsSuccess());
+      resolve([]);
+    } catch (e) {
+      dispatch(deleteNotificationsFailure(e.message));
       reject(e);
     }
   });
@@ -212,6 +267,28 @@ export function setNotificationsSuccess(data: INotification[]): IActionSetNotifi
 export function setNotificationsFailure(message: string): IActionSetNotificationsFailure {
   return {
     type: SET_NOTIFICATIONS_FAILURE,
+    message,
+  };
+}
+
+/** Action Creator */
+export function deleteNotificationsRequest(): IActionDeleteNotificationsRequest {
+  return {
+    type: DELETE_NOTIFICATIONS_REQUEST,
+  };
+}
+
+/** Action Creator */
+export function deleteNotificationsSuccess(): IActionDeleteNotificationsSuccess {
+  return {
+    type: DELETE_NOTIFICATIONS_SUCCESS,
+  };
+}
+
+/** Action Creator */
+export function deleteNotificationsFailure(message: string): IActionDeleteNotificationsFailure {
+  return {
+    type: DELETE_NOTIFICATIONS_FAILURE,
     message,
   };
 }
