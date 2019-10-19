@@ -21,7 +21,7 @@ export interface IChattersRequest {
 
 /** Action Types */
 export const GET_CHATTERS_REQUEST = 'GET_CHATTERS_REQUEST';
-export const SET_CHATTERS_REQUEST = 'SET_CHATTERS_REQUEST';
+export const SET_CHATTER_REQUEST = 'SET_CHATTERS_REQUEST';
 export const GET_LIVE_CHATTERS_REQUEST = 'GET_LIVE_CHATTERS_REQUEST';
 export const GET_CHATTERS_SUCCESS = 'GET_CHATTERS_SUCCESS';
 export const SET_CHATTERS_SUCCESS = 'SET_CHATTERS_SUCCESS';
@@ -29,14 +29,14 @@ export const GET_LIVE_CHATTERS_SUCCESS = 'GET_LIVE_CHATTERS_SUCCESS';
 export const GET_CHATTERS_FAILURE = 'GET_CHATTERS_FAILURE';
 export const SET_CHATTERS_FAILURE = 'SET_CHATTERS_FAILURE';
 export const GET_LIVE_CHATTERS_FAILURE = 'GET_LIVE_CHATTERS_FAILURE';
+export const ADD_CHATTERS = 'ADD_CHATTERS';
 
 export interface IActionGetChattersRequest {
   type: typeof GET_CHATTERS_REQUEST;
 }
 
-export interface IActionSetChattersRequest {
-  type: typeof SET_CHATTERS_REQUEST;
-  data: IChatters;
+export interface IActionSetChatterRequest {
+  type: typeof SET_CHATTER_REQUEST;
 }
 
 export interface IActionGetLiveChattersRequest {
@@ -48,8 +48,9 @@ export interface IActionGetChattersSuccess {
   data: IChatters;
 }
 
-export interface IActionSetChattersSuccess {
+export interface IActionSetChatterSuccess {
   type: typeof SET_CHATTERS_SUCCESS;
+  data: IChatters;
 }
 
 export interface IActionGetLiveChattersSuccess {
@@ -62,7 +63,7 @@ export interface IActionGetChattersFailure {
   message: string;
 }
 
-export interface IActionSetChattersFailure {
+export interface IActionSetChatterFailure {
   type: typeof SET_CHATTERS_FAILURE;
   message: string;
 }
@@ -72,9 +73,14 @@ export interface IActionGetLiveChattersFailure {
   message: string;
 }
 
+export interface IActionAddChatters {
+  type: typeof ADD_CHATTERS;
+  data: IChatters;
+}
+
 export type IChattersAction = IActionGetChattersRequest | IActionGetChattersSuccess | IActionGetChattersFailure |
-  IActionSetChattersRequest | IActionSetChattersSuccess | IActionSetChattersFailure | IActionGetLiveChattersRequest |
-  IActionGetLiveChattersSuccess | IActionGetLiveChattersFailure;
+  IActionSetChatterRequest | IActionSetChatterSuccess | IActionSetChatterFailure | IActionGetLiveChattersRequest |
+  IActionGetLiveChattersSuccess | IActionGetLiveChattersFailure | IActionAddChatters;
 
 /** Initial State */
 const initialState: IChattersRequest = {
@@ -93,13 +99,9 @@ export function chattersReducer(state = initialState, action: IChattersAction) {
         isFetching: true
       };
 
-    case SET_CHATTERS_REQUEST:
+    case SET_CHATTER_REQUEST:
       return {
         ...state,
-        data: {
-          ...state.data,
-          ...action.data
-        },
         isSaving: true
       };
 
@@ -116,6 +118,10 @@ export function chattersReducer(state = initialState, action: IChattersAction) {
       return {
         ...state,
         isSaving: false,
+        data: {
+          ...state.data,
+          ...action.data
+        },
         error: false
       };
 
@@ -157,6 +163,15 @@ export function chattersReducer(state = initialState, action: IChattersAction) {
         message: action.message
       };
 
+    case ADD_CHATTERS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          ...action.data
+        },
+      };
+
     default:
       return state;
   }
@@ -185,42 +200,40 @@ export function getChatters(dispatch: Dispatch<IChattersAction>, chat: string) {
 }
 
 /** Async Action Creator */
-export function setChatters(dispatch: Dispatch<IChattersAction>, chat: string, chatters: IChatters) {
-  const usernames = Object.keys(chatters);
-  usernames.length = 300;
-  usernames.forEach((username, index) => {
-    setTimeout(() => {
-      dispatch(setChattersRequest(chatters));
+export function setChatter(dispatch: Dispatch<IChattersAction>, chat: string, chatters: IChatters, username: string) {
+  dispatch(setChatterRequest());
 
-      return new Promise(async (resolve, reject) => {
-        try {
-          const response = await fetch(`https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test/chatters`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              chat,
-              username,
-              firstChatMessage: chatters[username].firstChatMessage,
-              firstChatMessageTimestamp: chatters[username].firstChatMessageTimestamp,
-              firstJoinedTimestamp: chatters[username].firstJoinedTimestamp
-            })
-          });
-          const json = await response.json();
-
-          if (!response.ok) {
-            throw (new Error(json.errorMessage));
-          }
-
-          dispatch(setChattersSuccess());
-          resolve();
-        } catch (e) {
-          dispatch(getChattersFailure(e.message));
-          reject(e);
-        }
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(`https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test/chatters`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chat,
+          username,
+          firstChatMessage: chatters[username].firstChatMessage,
+          firstChatMessageTimestamp: chatters[username].firstChatMessageTimestamp,
+          firstJoinedTimestamp: chatters[username].firstJoinedTimestamp
+        })
       });
-    }, 200 * index);
+      const json = await response.json();
+
+      if (!response.ok) {
+        throw (new Error(json.errorMessage));
+      }
+
+      dispatch(setChatterSuccess({
+        [username]: chatters[username]
+      }));
+      resolve({
+        [username]: chatters[username]
+      });
+    } catch (e) {
+      dispatch(getChattersFailure(e.message));
+      reject(e);
+    }
   });
 }
 
@@ -258,6 +271,11 @@ export function getLiveChatters(dispatch: Dispatch<IChattersAction>, chat: strin
   });
 }
 
+/** Async Action Creator */
+export function addChatters(dispatch: Dispatch<IChattersAction>, chatters: IChatters) {
+  dispatch(addChattersAction(chatters));
+}
+
 /** Action Creator */
 export function getChattersRequest(): IActionGetChattersRequest {
   return {
@@ -266,10 +284,9 @@ export function getChattersRequest(): IActionGetChattersRequest {
 }
 
 /** Action Creator */
-export function setChattersRequest(data: IChatters): IActionSetChattersRequest {
+export function setChatterRequest(): IActionSetChatterRequest {
   return {
-    type: SET_CHATTERS_REQUEST,
-    data
+    type: SET_CHATTER_REQUEST
   };
 }
 
@@ -282,9 +299,10 @@ export function getChattersSuccess(data: IChatters): IActionGetChattersSuccess {
 }
 
 /** Action Creator */
-export function setChattersSuccess(): IActionSetChattersSuccess {
+export function setChatterSuccess(data: IChatters): IActionSetChatterSuccess {
   return {
-    type: SET_CHATTERS_SUCCESS
+    type: SET_CHATTERS_SUCCESS,
+    data
   };
 }
 
@@ -297,7 +315,7 @@ export function getChattersFailure(message: string): IActionGetChattersFailure {
 }
 
 /** Action Creator */
-export function setChattersFailure(message: string): IActionSetChattersFailure {
+export function setChatterFailure(message: string): IActionSetChatterFailure {
   return {
     type: SET_CHATTERS_FAILURE,
     message,
@@ -320,9 +338,17 @@ export function getLiveChattersSuccess(data: IChatters): IActionGetLiveChattersS
 }
 
 /** Action Creator */
-export function getLiveChattersFailure(message: string): IActionGetLiveChattersFailure {
+export function getLiveChattersFailure(data: string): IActionGetLiveChattersFailure {
   return {
     type: GET_LIVE_CHATTERS_FAILURE,
-    message,
+    message: data,
+  };
+}
+
+/** Action Creator */
+export function addChattersAction(data: IChatters): IActionAddChatters {
+  return {
+    type: ADD_CHATTERS,
+    data
   };
 }

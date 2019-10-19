@@ -1,7 +1,7 @@
 // tslint:disable: max-line-length
 
 import * as React from 'react';
-import { INotification, setNotifications, INotificationsRequest, getNotifications } from '../../redux/modules/notifications';
+import { INotification, INotificationsRequest, getNotifications } from '../../redux/modules/notifications';
 import { ISettingsAction, getSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
@@ -9,13 +9,14 @@ import { Dispatch } from 'redux';
 import { getConfigs, IConfigsRequest } from '../../redux/modules/configs';
 import { IEnv } from '../../redux/modules/env';
 import { Notification } from '../../components/Notification';
-import { getChatters, getLiveChatters, setChatters, IChattersRequest, IChatters, IChatter } from '../../redux/modules/chatters';
+import { getChatters, getLiveChatters, setChatter, IChattersRequest, IChatters, IChatter } from '../../redux/modules/chatters';
 
 const style = require('./style.scss');
 
 interface IState {
   notifications: INotification[];
   display: boolean;
+  notificationsPostQueue: INotification[];
 }
 
 interface IProps {
@@ -41,6 +42,7 @@ interface IChatMessage {
 class SourceC extends React.Component<IProps, IState> {
   private liveChattersFetchInterval: any;
   private notificationInterval: any;
+  private notificationsPostInterval: any;
   private sound: any;
 
   constructor(props: IProps) {
@@ -48,12 +50,14 @@ class SourceC extends React.Component<IProps, IState> {
 
     this.state = {
       notifications: [],
-      display: false
+      display: false,
+      notificationsPostQueue: []
     };
 
     this.sound = new Audio('assets/audio/default.mp3');
     this.liveChattersFetchInterval = null;
     this.notificationInterval = null;
+    this.notificationsPostInterval = null;
   }
 
   public async componentDidMount() {
@@ -85,6 +89,7 @@ class SourceC extends React.Component<IProps, IState> {
       window.Streamlabs.onChatMessage(this.onChatMessage);
       window.Streamlabs.twitch.initTwitchChat();
       this.liveChattersFetchInterval = setInterval(this.fetchLiveChatters, 60000);
+      this.notificationsPostInterval = setInterval(this.postChatters, 5000);
 
       this.sound.src = `${(settings.notificationAudioUrl) ? settings.notificationAudioUrl : 'assets/audio/default.mp3'}`;
     } catch (e) {
@@ -97,20 +102,40 @@ class SourceC extends React.Component<IProps, IState> {
   public componentWillUnmount() {
     clearInterval(this.liveChattersFetchInterval);
     clearInterval(this.notificationInterval);
+    clearInterval(this.notificationsPostInterval);
+  }
+
+  private postChatters = () => {
+    window.Streamlabs.postMessage('NOTIFICATIONS', this.state.notificationsPostQueue);
+    this.setState({
+      notificationsPostQueue: []
+    });
   }
 
   private fetchLiveChatters = async () => {
     const { dispatch, configs, chatters } = this.props;
     const newChatters = await getLiveChatters(dispatch, configs.data.profiles.twitch.name, chatters.data) as IChatters;
-    setChatters(dispatch, configs.data.profiles.twitch.name, newChatters);
+    const usernames = Object.keys(newChatters);
+    usernames.length = 300;
+    usernames.forEach((username, index) => {
+      setTimeout(() => {
+        const notification = {
+          type: 'JOIN',
+          username,
+          chatter: newChatters[username],
+          timestamp: new Date().getTime()
+        };
 
-    Object.keys(newChatters).forEach((username) => {
-      this.notify({
-        type: 'JOIN',
-        username,
-        chatter: newChatters[username],
-        timestamp: new Date().getTime()
-      });
+        this.setState((prevState: IState) => ({
+          notificationsPostQueue: [
+            ...prevState.notificationsPostQueue,
+            notification
+          ]
+        }));
+
+        this.notify(notification);
+        setChatter(dispatch, configs.data.profiles.twitch.name, newChatters, username);
+      }, 200 * index);
     });
   }
 
@@ -133,24 +158,31 @@ class SourceC extends React.Component<IProps, IState> {
         firstChatMessage: message.body,
         firstChatMessageTimestamp: String(new Date().getTime())
       };
+    } else {
+      return;
     }
 
-    if (chatter.firstJoinedTimestamp) {
-      setChatters(dispatch, configs.data.profiles.twitch.name, {
-        [message.from]: chatter
-      });
+    setChatter(dispatch, configs.data.profiles.twitch.name, {
+      [message.from]: chatter
+    }, message.from);
 
-      this.notify({
-        type: 'MESSAGE',
-        username: message.from,
-        chatter,
-        timestamp: new Date().getTime()
-      });
-    }
+    const notification = {
+      type: 'MESSAGE',
+      username: message.from,
+      chatter,
+      timestamp: new Date().getTime()
+    };
+
+    this.setState((prevState: IState) => ({
+      notificationsPostQueue: [
+        ...prevState.notificationsPostQueue,
+        notification
+      ]
+    }));
+    this.notify(notification);
   }
 
   private notify = (notification: INotification) => {
-
     this.setState((prevState: IState) => {
       const newNotifications: INotification[] = [...prevState.notifications];
       newNotifications.push(notification);
@@ -167,15 +199,9 @@ class SourceC extends React.Component<IProps, IState> {
   }
 
   private showNotification = () => {
-    const { settings, dispatch, notifications } = this.props;
+    const { settings } = this.props;
 
     setTimeout(() => {
-      window.Streamlabs.postMessage('NOTIFICATION', this.state.notifications[0]);
-      setNotifications(dispatch, [
-        this.state.notifications[0],
-        ...notifications.data
-      ]);
-
       if (settings.data.playSound) {
         this.sound.play();
       }

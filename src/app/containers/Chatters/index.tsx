@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import moment from 'moment';
-import { IChattersRequest, IChattersAction, getChatters } from '../../redux/modules/chatters';
+import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters';
 import { IStore } from '../../redux/IStore';
 import Layout from 'antd/lib/layout';
 import Table from 'antd/lib/table';
@@ -15,6 +15,7 @@ import _ from 'lodash';
 import Icon from 'antd/lib/icon';
 import { IConfigsRequest } from '../../redux/modules/configs';
 import { IEnv } from '../../redux/modules/env';
+import { INotification } from '../../redux/modules/notifications';
 
 const { Content } = Layout;
 const style = require('./style.scss');
@@ -71,6 +72,20 @@ class ChattersC extends React.Component<IProps, IState> {
     const { dispatch, configs } = this.props;
 
     getChatters(dispatch, configs.data.profiles.twitch.name);
+    window.Streamlabs.onMessage(this.onMessage);
+  }
+
+  private onMessage = (event: MessageEvent) => {
+    const { dispatch } = this.props;
+
+    if (event.type === 'NOTIFICATIONS') {
+      const chatters: IChatters = {};
+      event.data.forEach((notification: INotification) => {
+        chatters[notification.username] = notification.chatter;
+      });
+
+      addChatters(dispatch, chatters);
+    }
   }
 
   private getColumnSearchProps = (dataIndex: string) => {

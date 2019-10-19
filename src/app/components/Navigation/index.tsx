@@ -29,12 +29,6 @@ class NavigationC extends React.Component<IProps & RouteComponentProps> {
               search: location.search
             }}>Chatters</Link>
           </Menu.Item>
-          <Menu.Item key="/feed">
-            <Link to={{
-              pathname: '/feed',
-              search: location.search
-            }}>Notifications</Link>
-          </Menu.Item>
         </Menu>
       </div>
     );
