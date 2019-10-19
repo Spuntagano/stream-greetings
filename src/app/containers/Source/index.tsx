@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { INotification, INotificationsRequest, getNotifications } from '../../redux/modules/notifications';
-import { ISettingsAction, getSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
+import { ISettingsAction, getSettings, receiveSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
 import { Dispatch } from 'redux';
@@ -63,22 +63,20 @@ class SourceC extends React.Component<IProps, IState> {
   public async componentDidMount() {
     const { dispatch } = this.props;
 
-    // window.Streamlabs.onMessage((event: MessageEvent) => {
-    //   const message = (typeof event.data === 'string') ? JSON.parse(event.data) : event.data;
-
-    //   switch (event.type) {
-    //     case 'replay':
-    //       this.onMessage(event);
-    //       break;
-    //     case 'testNotification':
-    //       this.onMessage(event);
-    //       break;
-    //     case 'settings':
-    //       receiveSettings(dispatch, message);
-    //       break;
-    //     default:
-    //   }
-    // });
+    window.Streamlabs.onMessage((event: MessageEvent) => {
+      switch (event.type) {
+        case 'REPLAY':
+          this.notify(event.data);
+          break;
+        case 'TEST_NOTIFICATION':
+          this.notify(event.data);
+          break;
+        case 'SETTINGS':
+          receiveSettings(dispatch, event.data);
+          break;
+        default:
+      }
+    });
 
     try {
       const settings = await getSettings(dispatch) as ISettings;

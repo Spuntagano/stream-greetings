@@ -9,6 +9,7 @@ import Table from 'antd/lib/table';
 import Card from 'antd/lib/card';
 import Input from 'antd/lib/input';
 import Button from 'antd/lib/button';
+import notification from 'antd/lib/notification';
 import Highlighter from 'react-highlight-words';
 import { Spinner } from '../../components';
 import _ from 'lodash';
@@ -180,10 +181,40 @@ class ChattersC extends React.Component<IProps, IState> {
         key: 'firstChatMessage',
         sorter: (a: IChatterTransformed, b: IChatterTransformed) => (a.firstChatMessage).localeCompare(b.firstChatMessage),
         ...this.getColumnSearchProps('firstChatMessage'),
+      },
+      {
+        title: 'Replay',
+        dataIndex: 'replay',
+        key: 'replay',
+        className: style.notificationsReplay
       }
     ];
 
     return columns;
+  }
+
+  private replay = (username: string) => async () => {
+    const { chatters } = this.props;
+
+    const notif: INotification = {
+      username,
+      chatter: chatters.data[username],
+      timestamp: parseInt(chatters.data[username].firstChatMessageTimestamp || '', 10) || parseInt(chatters.data[username].firstJoinedTimestamp, 10),
+      type: chatters.data[username].firstChatMessage ? 'MESSAGE' : 'JOIN'
+    };
+
+    try {
+      await window.Streamlabs.postMessage('REPLAY', notif);
+      notification.open({
+        message: 'Notification replay sent',
+        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
+      });
+    } catch (e) {
+      notification.open({
+        message: 'An error as occured',
+        icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
+      });
+    }
   }
 
   private dataTransformer = (username: string) => {
@@ -197,6 +228,7 @@ class ChattersC extends React.Component<IProps, IState> {
       firstChatMessage: chatters.data[username].firstChatMessage || '',
       firstJoinedTimestamp: chatters.data[username].firstJoinedTimestamp || '0',
       firstChatMessageTimestamp: chatters.data[username].firstChatMessageTimestamp || '0',
+      replay: <Icon onClick={this.replay(username)} type="redo" style={{ color: '#108ee9' }} />,
       key: username
     };
   }

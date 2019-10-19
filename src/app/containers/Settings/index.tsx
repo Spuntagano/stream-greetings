@@ -71,7 +71,7 @@ class SettingsC extends React.Component<IProps, IState> {
     try {
       const settings = form.getFieldsValue();
       await setSettings(dispatch, settings);
-      await window.Streamlabs.postMessage('settings', settings);
+      await window.Streamlabs.postMessage('SETTINGS', settings);
 
       notification.open({
         message: 'Settings saved',
@@ -102,7 +102,7 @@ class SettingsC extends React.Component<IProps, IState> {
 
   private testNotification = async () => {
     try {
-      await window.Streamlabs.postMessage('testNotification', this.getTestNotification());
+      await window.Streamlabs.postMessage('TEST_NOTIFICATION', this.getTestNotification());
       notification.open({
         message: 'Test notification sent',
         icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
