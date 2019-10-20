@@ -183,7 +183,7 @@ export function getChatters(dispatch: Dispatch<IChattersAction>, chat: string) {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch(`https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test/chatters/${chat}`);
+      const response = await fetch(`${process.env.API_URL_BASE_PATH}/chatters/${chat}`);
       const json = await response.json();
 
       if (!response.ok) {
@@ -205,7 +205,7 @@ export function setChatter(dispatch: Dispatch<IChattersAction>, chat: string, ch
 
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch(`https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test/chatters`, {
+      const response = await fetch(`${process.env.API_URL_BASE_PATH}/chatters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -243,7 +243,7 @@ export function getLiveChatters(dispatch: Dispatch<IChattersAction>, chat: strin
 
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch(`https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test/live-chatters/${chat}`);
+      const response = await fetch(`${process.env.API_URL_BASE_PATH}/live-chatters/${chat}`);
       const json = await response.json();
 
       if (!response.ok) {

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import JSEncrypt from 'jsencrypt';
 import { ISettingsRequest, ISettingsAction, getSettings, setSettings } from '../../redux/modules/settings';
 import { IStore } from '../../redux/IStore';
 import Card from 'antd/lib/card';
@@ -20,7 +19,6 @@ import { AudioUpload } from '../../components/AudioUpload';
 import _ from 'lodash';
 import { INotification } from '../../redux/modules/notifications';
 import { IConfigsRequest } from '../../redux/modules/configs';
-import { IEnv } from '../../redux/modules/env';
 import { Notification } from '../../components/Notification';
 import TextArea from 'antd/lib/input/TextArea';
 import { ColorPicker } from '../../components/ColorPicker';
@@ -33,7 +31,6 @@ interface IProps {
   settings: ISettingsRequest;
   configs: IConfigsRequest;
   dispatch: Dispatch;
-  env: IEnv;
   form: any;
   location: any;
 }
@@ -45,22 +42,18 @@ interface IState {
 }
 
 class SettingsC extends React.Component<IProps, IState> {
-  public jsEncrypt: any;
 
   constructor(props: IProps) {
     super(props);
 
-    this.jsEncrypt = new JSEncrypt();
-    this.jsEncrypt.setPublicKey(atob(props.env.PUB_KEY));
   }
 
   public async componentDidMount() {
-    const { dispatch, form, configs } = this.props;
+    const { dispatch, form } = this.props;
 
     const settings = await getSettings(dispatch);
     form.setFieldsValue({
       ...settings,
-      token: this.jsEncrypt.encrypt(configs.data.token)
     });
   }
 
@@ -264,8 +257,7 @@ export const Settings = connect(
   (state: IStore) => {
     return {
       settings: state.settings,
-      configs: state.configs,
-      env: state.env
+      configs: state.configs
     };
   },
   (d: Dispatch<ISettingsAction>) => ({ dispatch: d })

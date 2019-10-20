@@ -15,7 +15,6 @@ import { Spinner } from '../../components';
 import _ from 'lodash';
 import Icon from 'antd/lib/icon';
 import { IConfigsRequest } from '../../redux/modules/configs';
-import { IEnv } from '../../redux/modules/env';
 import { INotification } from '../../redux/modules/notifications';
 
 const { Content } = Layout;
@@ -26,7 +25,6 @@ interface IProps {
   configs: IConfigsRequest;
   dispatch: Dispatch;
   form: any;
-  env: IEnv;
 }
 
 interface IState {
@@ -254,8 +252,7 @@ export const Chatters = connect(
   (state: IStore) => {
     return {
       chatters: state.chatters,
-      configs: state.configs,
-      env: state.env
+      configs: state.configs
     };
   },
   (d: Dispatch<IChattersAction>) => ({ dispatch: d })

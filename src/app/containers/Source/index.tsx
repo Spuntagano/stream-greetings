@@ -1,13 +1,12 @@
 // tslint:disable: max-line-length
 
 import * as React from 'react';
-import { INotification, INotificationsRequest, getNotifications } from '../../redux/modules/notifications';
+import { INotification } from '../../redux/modules/notifications';
 import { ISettingsAction, getSettings, receiveSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
 import { Dispatch } from 'redux';
 import { getConfigs, IConfigsRequest } from '../../redux/modules/configs';
-import { IEnv } from '../../redux/modules/env';
 import { Notification } from '../../components/Notification';
 import { getChatters, getLiveChatters, setChatter, IChattersRequest, IChatters, IChatter } from '../../redux/modules/chatters';
 
@@ -23,8 +22,6 @@ interface IProps {
   settings: ISettingsRequest;
   configs: IConfigsRequest;
   chatters: IChattersRequest;
-  notifications: INotificationsRequest;
-  env: IEnv;
   dispatch: Dispatch;
 }
 
@@ -82,7 +79,6 @@ class SourceC extends React.Component<IProps, IState> {
       const settings = await getSettings(dispatch) as ISettings;
       const configs = await getConfigs(dispatch);
       await getChatters(dispatch, configs.profiles.twitch.name);
-      await getNotifications(dispatch);
       this.fetchLiveChatters();
       window.Streamlabs.onChatMessage(this.onChatMessage);
       window.Streamlabs.twitch.initTwitchChat();
@@ -251,9 +247,7 @@ export const Source = connect(
     return {
       settings: state.settings,
       configs: state.configs,
-      chatters: state.chatters,
-      notifications: state.notifications,
-      env: state.env
+      chatters: state.chatters
      };
   },
   (d: Dispatch<ISettingsAction>) => ({ dispatch: d })

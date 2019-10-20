@@ -1,11 +1,9 @@
 import { Dispatch } from 'redux';
-import { IRequest } from '../requests';
 import { ISettings } from '../settings';
 import { IProfiles } from '../configs';
 
 export interface IInfo {
   profiles: IProfiles;
-  requests: IRequest[];
   settings: ISettings;
 }
 
@@ -71,8 +69,7 @@ const initialState: IInfosRequest = {
       primaryColor: '#ffffff',
       secondaryColor: '#00ffff',
       fontFamily: 'arial'
-    },
-    requests: []
+    }
   }
 };
 
