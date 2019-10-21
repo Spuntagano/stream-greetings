@@ -91,11 +91,6 @@ module.exports = (_env, argv) => {
                     ],
                 },
                 {
-                    test: /\.scss$/,
-                    exclude: path.resolve('./src/app'),
-                    loaders: ['style-loader', 'css-loader', 'sass-loader'],
-                },
-                {
                     test: /\.less$/,
                     loaders: [{
                         loader: 'style-loader'

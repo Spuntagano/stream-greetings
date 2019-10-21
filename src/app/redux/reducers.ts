@@ -3,15 +3,15 @@ import { routerReducer } from 'react-router-redux';
 import { IStore } from './IStore';
 import { settingsReducer } from './modules/settings';
 import { configsReducer } from './modules/configs';
-import { infosReducer } from './modules/infos';
 import { chattersReducer } from './modules/chatters';
+import { hintsReducer } from './modules/hints';
 
 const rootReducer: Reducer<IStore> = combineReducers<IStore>({
   router: routerReducer,
   settings: settingsReducer,
   configs: configsReducer,
-  infos: infosReducer,
-  chatters: chattersReducer
+  chatters: chattersReducer,
+  hints: hintsReducer
 });
 
 export default rootReducer;

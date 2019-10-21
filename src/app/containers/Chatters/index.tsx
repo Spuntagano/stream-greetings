@@ -43,16 +43,15 @@ interface IColumn {
   dataIndex: string;
   key: string;
   sorter?: (a: IChatterTransformed, b: IChatterTransformed) => number;
+  defaultSortOrder?: 'descend' | 'ascend' | undefined;
   className?: string;
 }
 
 interface IChatterTransformed {
   username: string;
-  firstJoinedTimestamp: string;
   firstChatMessage: string;
-  firstChatMessageTimestamp: string;
-  firstChatMessageDate: string;
-  firstJoinedDate: string;
+  latestActionTimestamp: string;
+  latestActionDate: string;
   key: string;
 }
 
@@ -155,6 +154,13 @@ class ChattersC extends React.Component<IProps, IState> {
   private getColumns = () => {
     const columns: IColumn[] = [
       {
+        title: 'Date',
+        dataIndex: 'latestActionDate',
+        key: 'latestActionDate',
+        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt((b.latestActionTimestamp), 10) - parseInt((a.latestActionTimestamp), 10)),
+        defaultSortOrder: 'descend'
+      },
+      {
         title: 'Username',
         dataIndex: 'username',
         key: 'username',
@@ -162,29 +168,16 @@ class ChattersC extends React.Component<IProps, IState> {
         ...this.getColumnSearchProps('username'),
       },
       {
-        title: 'First Joined Date',
-        dataIndex: 'firstJoinedDate',
-        key: 'firstJoinedDate',
-        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt(b.firstJoinedTimestamp, 10) - parseInt(a.firstJoinedTimestamp, 10))
-      },
-      {
-        title: 'First Chat Message Date',
-        dataIndex: 'firstChatMessageDate',
-        key: 'firstChatMessageDate',
-        sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt((b.firstChatMessageTimestamp), 10) - parseInt((a.firstChatMessageTimestamp), 10))
-      },
-      {
-        title: 'First Chat Message',
+        title: 'First chat message',
         dataIndex: 'firstChatMessage',
         key: 'firstChatMessage',
         sorter: (a: IChatterTransformed, b: IChatterTransformed) => (a.firstChatMessage).localeCompare(b.firstChatMessage),
-        ...this.getColumnSearchProps('firstChatMessage'),
       },
       {
         title: 'Replay',
         dataIndex: 'replay',
         key: 'replay',
-        className: style.notificationsReplay
+        className: style.chattersReplay
       }
     ];
 
@@ -220,12 +213,9 @@ class ChattersC extends React.Component<IProps, IState> {
 
     return {
       username,
-      firstJoinedDate: moment(parseInt((chatters.data[username].firstJoinedTimestamp || ''), 10)).fromNow(),
-      firstChatMessageDate: (chatters.data[username].firstChatMessageTimestamp) ?
-              moment(parseInt((chatters.data[username].firstChatMessageTimestamp || ''), 10)).fromNow() : '',
       firstChatMessage: chatters.data[username].firstChatMessage || '',
-      firstJoinedTimestamp: chatters.data[username].firstJoinedTimestamp || '0',
-      firstChatMessageTimestamp: chatters.data[username].firstChatMessageTimestamp || '0',
+      latestActionTimestamp: chatters.data[username].firstChatMessageTimestamp || chatters.data[username].firstJoinedTimestamp,
+      latestActionDate: moment(parseInt(chatters.data[username].firstChatMessageTimestamp || chatters.data[username].firstJoinedTimestamp, 10)).fromNow(),
       replay: <Icon onClick={this.replay(username)} type="redo" style={{ color: '#108ee9' }} />,
       key: username
     };
@@ -241,7 +231,7 @@ class ChattersC extends React.Component<IProps, IState> {
           {chatters.error && <h2>Error loading chatters</h2>}
           {!chatters.isFetching && !chatters.error && <div>
             <h1>Chatters</h1>
-            <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.dataTransformer)} columns={this.getColumns()} />;
+            <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.dataTransformer)} columns={this.getColumns()} />
           </div>}
         </Card>
       </Content>

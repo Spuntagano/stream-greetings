@@ -11,6 +11,10 @@ import { routes } from '../../routes';
 import Icon from 'antd/lib/icon';
 import notification from 'antd/lib/notification';
 import Layout from 'antd/lib/layout';
+import Modal from 'antd/lib/Modal';
+import Tooltip from 'antd/lib/tooltip';
+import Carousel from 'antd/lib/carousel';
+import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints';
 
 const { Header } = Layout;
 const style = require('./style.scss');
@@ -18,12 +22,14 @@ const style = require('./style.scss');
 interface IProps {
   dispatch: Dispatch;
   configs: IConfigsRequest;
+  hints: IHintsRequest;
 }
 
 interface IState {
   loaded: boolean;
   sourceLoaded: false;
   theme: string;
+  introCarouselCurrentSlide: number;
 }
 
 interface IEvents {
@@ -33,6 +39,8 @@ interface IEvents {
 class AppC extends React.Component<IProps, IState> {
   private streamlabsOBS: any;
   private sourcesQueue: any[];
+  private carousel: Carousel | null;
+  private slides: React.ReactElement[];
 
   constructor(props: IProps) {
     super(props);
@@ -42,8 +50,16 @@ class AppC extends React.Component<IProps, IState> {
     this.state = {
       loaded: false,
       sourceLoaded: false,
-      theme: 'night'
+      theme: 'night',
+      introCarouselCurrentSlide: 0
     };
+    this.carousel = null;
+    this.slides = [
+      <div key="1">1</div>,
+      <div key="2">2</div>,
+      <div key="3">3</div>,
+      <div key="3">3</div>
+    ];
   }
 
   public async componentDidMount() {
@@ -51,6 +67,7 @@ class AppC extends React.Component<IProps, IState> {
 
     try {
       await getConfigs(dispatch);
+      await getHints(dispatch);
       this.setState({ loaded: true });
     } catch (e) {
       notification.open({
@@ -112,6 +129,32 @@ class AppC extends React.Component<IProps, IState> {
     });
   }
 
+  private closeIntroModal = () => {
+    const { dispatch, hints } = this.props;
+    setHints(dispatch, {
+      ...hints.data,
+      showIntroModal: false
+    });
+  }
+
+  private nextIntroModal = () => {
+    if (this.state.introCarouselCurrentSlide === this.slides.length - 1) {
+      this.closeIntroModal();
+      return;
+    }
+
+    if (this.carousel) {
+      this.carousel.next();
+    }
+  }
+
+  // @ts-ignore
+  private onCarouselBeforeChange = (currentSlide: number, nextSlide: number) => {
+    this.setState({
+      introCarouselCurrentSlide: nextSlide
+    });
+  }
+
   public render() {
     return this.state.loaded && (
       <Layout className={style.AppContainer}>
@@ -121,12 +164,38 @@ class AppC extends React.Component<IProps, IState> {
           padding: 0
         }}>
           <Navigation className={style.navigation} />
-          {this.state.sourceLoaded && <div className={style.sourceLoaded}>Source loaded</div>}
-          {!this.state.sourceLoaded && <div className={style.sourceLoaded}>Source not loaded</div>}
+          <div className={style.sourceLoaded}>
+            {this.state.sourceLoaded && <Tooltip placement="bottomRight" title="New users are being recorded">
+              <span style={{color: '#52c41a'}}>Status: Active</span>
+            </Tooltip>}
+            {!this.state.sourceLoaded &&
+              <Tooltip
+                placement="bottomRight"
+                title="New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene"
+              >
+                <span style={{color: '#f5222d'}}>Status: Inactive</span>
+              </Tooltip>}
+          </div>
         </Header>
         <Layout className={style.container}>
           {renderRoutes(routes[0].routes)}
         </Layout>
+        <Modal
+          title="Tutorial"
+          centered={true}
+          visible={this.props.hints.data.showIntroModal}
+          okText="Next"
+          onOk={this.nextIntroModal}
+          cancelText="Close"
+          onCancel={this.closeIntroModal}
+          closable={false}
+        >
+          <div className={style.carousel}>
+            <Carousel ref={node => this.carousel = node} beforeChange={this.onCarouselBeforeChange}>
+              {this.slides}
+            </Carousel>
+          </div>
+        </Modal>
       </Layout>
     );
   }
@@ -134,7 +203,10 @@ class AppC extends React.Component<IProps, IState> {
 
 export const App = connect(
   (state: IStore) => {
-    return { configs: state.configs };
+    return {
+      configs: state.configs,
+      hints: state.hints
+    };
   },
   (d: Dispatch<IConfigsAction>) => ({ dispatch: d })
 )(AppC);

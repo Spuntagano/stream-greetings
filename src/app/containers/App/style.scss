@@ -7,9 +7,22 @@
   .sourceLoaded {
     width: 200px;
     float: left;
-    text-align: center;
+    text-align: right;
     border-bottom: 1px solid #e8e8e8;
     line-height: 63px;
     height: 64px;
+    font-weight: 700;
+    font-size: 14px;
+    padding-right: 35px;
+  }
+}
+
+.carousel {
+  ul > li > button {
+    background-color: #1890ff !important;
+    border-radius: 50% !important;
+    width: 10px !important;
+    height: 10px !important;
+    margin: 2px !important;
   }
 }
