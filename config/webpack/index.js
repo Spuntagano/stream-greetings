@@ -7,6 +7,8 @@ const postcssNext = require('postcss-cssnext');
 const stylelint = require('stylelint');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
+const darkTheme = require('@ant-design/dark-theme');
+
 
 module.exports = (_env, argv) => {
     let entryPoints = {
@@ -101,7 +103,7 @@ module.exports = (_env, argv) => {
                         options: {
                             javascriptEnabled: true,
                             modifyVars: {
-                                'layout-body-background': '#fbfbfb'
+                                ...darkTheme.default
                             }
                         }
                     }]

@@ -97,6 +97,7 @@
     "webpack-manifest-plugin": "^2.0.2"
   },
   "dependencies": {
+    "@ant-design/dark-theme": "^1.0.3",
     "antd": "^3.15.0",
     "babel-polyfill": "^6.26.0",
     "censor-sensor": "^1.0.4",

@@ -160,7 +160,7 @@ class AppC extends React.Component<IProps, IState> {
       <Layout className={style.AppContainer}>
         <Helmet {...appConfig.app} {...appConfig.app.head} />
         <Header style={{
-          backgroundColor: '#fff',
+          backgroundColor: '#30303d',
           padding: 0
         }}>
           <Navigation className={style.navigation} />
