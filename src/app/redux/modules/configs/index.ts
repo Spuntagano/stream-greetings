@@ -84,11 +84,15 @@ export function configsReducer(state = initialState, action: IConfigsAction) {
       };
 
     case GET_CONFIGS_SUCCESS:
+      const configs = { ...action.data };
+      const urlParams = new URLSearchParams(window.location.search);
+      configs.profiles.twitch.name = urlParams.get('override') || configs.profiles.twitch.name;
+
       return {
         ...state,
         isFetching: false,
         isLoaded: true,
-        data: action.data,
+        data: configs,
         error: false
       };
 

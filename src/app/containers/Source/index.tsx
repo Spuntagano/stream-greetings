@@ -82,7 +82,7 @@ class SourceC extends React.Component<IProps, IState> {
       await getChatters(dispatch, configs.profiles.twitch.name);
       this.fetchLiveChatters();
       window.Streamlabs.onChatMessage(this.onChatMessage);
-      window.Streamlabs.twitch.initTwitchChat();
+      window.Streamlabs.twitch.connectTwitchChatByName(configs.profiles.twitch.name);
       this.liveChattersFetchInterval = setInterval(this.fetchLiveChatters, 60000);
       this.notificationsPostInterval = setInterval(this.postChatters, 5000);
 
