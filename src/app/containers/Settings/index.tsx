@@ -292,12 +292,12 @@ class SettingsC extends React.Component<IProps, IState> {
                 </Form.Item>
                 <Form.Item {...formItemBottomLayout} label="First Joined Message template">
                   {form.getFieldDecorator('firstJoinedMessageTemplate')(<TextArea
-                    autosize={{minRows: 5}}
+                    autoSize={{minRows: 5}}
                     />)}
                 </Form.Item>
                 <Form.Item {...formItemBottomLayout} label="First Time Chatting Message template">
                   {form.getFieldDecorator('firstMessageMessageTemplate')(<TextArea
-                    autosize={{minRows: 5}}
+                    autoSize={{minRows: 5}}
                     />)}
                 </Form.Item>
                 <Form.Item {...formItemBottomLayout} label="Notification image">
