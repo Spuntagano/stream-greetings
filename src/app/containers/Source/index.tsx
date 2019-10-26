@@ -70,6 +70,7 @@ class SourceC extends React.Component<IProps, IState> {
           break;
         case 'SETTINGS':
           receiveSettings(dispatch, event.data);
+          this.removeEventsFromQueue(event.data);
           break;
         default:
       }
@@ -99,6 +100,22 @@ class SourceC extends React.Component<IProps, IState> {
     clearInterval(this.notificationsPostInterval);
   }
 
+  private removeEventsFromQueue(settings: ISettings) {
+    this.setState((prevState: IState) => ({
+      notifications: prevState.notifications.filter((notification: INotification) => {
+        if (notification.type === 'JOIN' && !settings.showFirstJoinedNotification) {
+          return false;
+        }
+
+        if (notification.type === 'MESSAGE' && !settings.showFirstChatMessageNotification) {
+          return false;
+        }
+
+        return true;
+      })
+    }));
+  }
+
   private postChatters = () => {
     window.Streamlabs.postMessage('NOTIFICATIONS', this.state.notificationsPostQueue);
     this.setState({
@@ -107,7 +124,8 @@ class SourceC extends React.Component<IProps, IState> {
   }
 
   private fetchLiveChatters = async () => {
-    const { dispatch, configs, chatters } = this.props;
+    const { dispatch, configs, chatters, settings } = this.props;
+
     const newChatters = await getLiveChatters(dispatch, configs.data.profiles.twitch.name, chatters.data) as IChatters;
     const usernames = Object.keys(newChatters);
     usernames.length = 300;
@@ -127,14 +145,17 @@ class SourceC extends React.Component<IProps, IState> {
           ]
         }));
 
-        this.notify(notification);
         setChatter(dispatch, configs.data.profiles.twitch.name, newChatters, username);
+
+        if (settings.data.showFirstJoinedNotification) {
+          this.notify(notification);
+        }
       }, 200 * index);
     });
   }
 
   private onChatMessage = (message: IChatMessage) => {
-    const { chatters, configs, dispatch } = this.props;
+    const { chatters, configs, settings, dispatch } = this.props;
 
     let chatter: IChatter = {
       firstJoinedTimestamp: ''
@@ -173,7 +194,10 @@ class SourceC extends React.Component<IProps, IState> {
         notification
       ]
     }));
-    this.notify(notification);
+
+    if (settings.data.showFirstChatMessageNotification) {
+      this.notify(notification);
+    }
   }
 
   private notify = (notification: INotification) => {

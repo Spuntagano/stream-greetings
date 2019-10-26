@@ -110,7 +110,10 @@ export function chattersReducer(state = initialState, action: IChattersAction) {
         ...state,
         isLoaded: true,
         isFetching: false,
-        data: action.data,
+        data: {
+          ...state.data,
+          ...action.data,
+        },
         error: false
       };
 
@@ -178,20 +181,24 @@ export function chattersReducer(state = initialState, action: IChattersAction) {
 }
 
 /** Async Action Creator */
-export function getChatters(dispatch: Dispatch<IChattersAction>, chat: string) {
+export function getChatters(dispatch: Dispatch<IChattersAction>, chat: string, startIndex?: string) {
   dispatch(getChattersRequest());
 
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch(`${process.env.API_URL_BASE_PATH}/chatters/${chat}`);
+      const response = await fetch(`${process.env.API_URL_BASE_PATH}/chatters/${chat}${(startIndex) ? `?startIndex=${startIndex}` : ''}`);
       const json = await response.json();
 
       if (!response.ok) {
         throw (new Error(json.errorMessage));
       }
 
+      if (json.lastIndex) {
+        await getChatters(dispatch, chat, json.lastIndex);
+      }
+
       dispatch(getChattersSuccess(json.chatters));
-      resolve(json.chatters);
+      resolve();
     } catch (e) {
       dispatch(getChattersFailure(e.message));
       reject(e);

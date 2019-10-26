@@ -158,7 +158,7 @@ class ChattersC extends React.Component<IProps, IState> {
         dataIndex: 'latestActionDate',
         key: 'latestActionDate',
         sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt((b.latestActionTimestamp), 10) - parseInt((a.latestActionTimestamp), 10)),
-        defaultSortOrder: 'descend'
+        defaultSortOrder: 'ascend'
       },
       {
         title: 'Username',
