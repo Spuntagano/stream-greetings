@@ -5,34 +5,34 @@ import Icon from 'antd/lib/icon';
 import notification from 'antd/lib/notification';
 import _ from 'lodash';
 
-const style = require('./style.scss');
+const style = require('./AudioUpload.scss');
 
 interface IProps {
-    imageKey: string;
-    imageUrl: string;
+    audioKey: string;
+    audioUrl: string;
     onSubmit?: (url: string) => void;
     onRemove?: () => void;
 }
 
 interface IState {
     previewVisible: boolean;
-    previewImage: string;
+    previewAudio: string;
     fileList: any[];
 }
 
-class ImageUploadC extends React.Component<IProps, IState> {
+class AudioUploadC extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
 
         this.state = {
             previewVisible: false,
-            previewImage: '',
-            fileList: props.imageUrl ? [
+            previewAudio: '',
+            fileList: props.audioUrl ? [
                 {
                     uid: '-1',
-                    name: 'xxx.png',
+                    name: 'xxx.mp3',
                     status: 'done',
-                    url: props.imageUrl
+                    url: props.audioUrl
                 },
             ] : [],
         };
@@ -55,7 +55,7 @@ class ImageUploadC extends React.Component<IProps, IState> {
         }
 
         this.setState({
-            previewImage: file.url || file.preview,
+            previewAudio: file.url || file.preview,
             previewVisible: true,
         });
     }
@@ -70,14 +70,14 @@ class ImageUploadC extends React.Component<IProps, IState> {
     }
 
     private customRequest = (upload: any) => {
-        const { imageKey, onSubmit } = this.props;
+        const { audioKey, onSubmit } = this.props;
 
         const promise = new Promise(async (resolve, reject) => {
             try {
-                const data = await window.Streamlabs.userSettings.addAssets([{ name: imageKey, file: upload.file }]);
-                this.setState({ fileList: [{ ...upload.file, url: data[imageKey] }] });
+                const data = await window.Streamlabs.userSettings.addAssets([{ name: audioKey, file: upload.file }]);
+                this.setState({ fileList: [{ ...upload.file, url: data[audioKey] }] });
                 if (onSubmit) {
-                    onSubmit(data[imageKey]);
+                    onSubmit(data[audioKey]);
                 }
                 resolve(data);
             } catch (e) {
@@ -103,12 +103,12 @@ class ImageUploadC extends React.Component<IProps, IState> {
     )
 
     public render() {
-        const { previewVisible, previewImage, fileList } = this.state;
+        const { previewVisible, previewAudio, fileList } = this.state;
 
         return (
             <div className={`${style.imageUpload} clearfix`}>
                 <Upload
-                    accept="image/*"
+                    accept="audio/*"
                     listType="picture-card"
                     fileList={fileList}
                     onPreview={this.handlePreview}
@@ -118,10 +118,10 @@ class ImageUploadC extends React.Component<IProps, IState> {
                     {fileList.length >= 1 ? null : this.uploadButton()}
                 </Upload>
                 <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                    <img alt="preview" style={{ width: '100%' }} src={previewImage} />
+                    <audio style={{ width: '100%', margin: '100px 0' }} controls={true} src={previewAudio} />
                 </Modal>
             </div>
         );
     }
 }
-export const ImageUpload = ImageUploadC;
+export const AudioUpload = AudioUploadC;

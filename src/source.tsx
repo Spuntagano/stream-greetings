@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 const { browserHistory } = require('react-router');
-import { Source } from './app/containers/Source';
+import { Source } from './app/containers/Source/Source';
 
 import { configureStore } from './app/redux/store';
 

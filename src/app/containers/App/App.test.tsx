@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 import { renderComponent } from '../../helpers/TestHelper';
-import { App } from './index';
+import { App } from './App';
 
 describe('<App />', () => {
   const component = renderComponent(App);

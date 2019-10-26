@@ -4,7 +4,7 @@ import Menu from 'antd/lib/menu';
 import { RouteComponentProps } from 'react-router';
 import _ from 'lodash';
 
-const style = require('./style.scss');
+const style = require('./Navigation.scss');
 
 interface IProps {
   className?: string;

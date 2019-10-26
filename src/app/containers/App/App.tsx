@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { getConfigs, IConfigsAction, IConfigsRequest } from '../../redux/modules/configs';
+import { getConfigs, IConfigsAction, IConfigsRequest } from '../../redux/modules/configs/configs';
 import { IStore } from '../../redux/IStore';
 import { Navigation } from '../../components';
 import { renderRoutes } from 'react-router-config';
@@ -14,10 +14,10 @@ import Layout from 'antd/lib/layout';
 import Modal from 'antd/lib/Modal';
 import Tooltip from 'antd/lib/tooltip';
 import Carousel from 'antd/lib/carousel';
-import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints';
+import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints';
 
 const { Header } = Layout;
-const style = require('./style.scss');
+const style = require('./App.scss');
 
 interface IProps {
   dispatch: Dispatch;

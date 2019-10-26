@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { ISettingsRequest, ISettingsAction, getSettings, setSettings, deleteSettings } from '../../redux/modules/settings';
+import { ISettingsRequest, ISettingsAction, getSettings, setSettings, deleteSettings } from '../../redux/modules/settings/settings';
 import { IStore } from '../../redux/IStore';
 import Card from 'antd/lib/card';
 import Input from 'antd/lib/input';
@@ -14,20 +14,20 @@ import Slider from 'antd/lib/slider';
 import Select from 'antd/lib/select';
 import Modal from 'antd/lib/Modal';
 import notification from 'antd/lib/notification';
-import { Spinner } from '../../components/Spinner';
-import { ImageUpload } from '../../components/ImageUpload';
-import { AudioUpload } from '../../components/AudioUpload';
+import { Spinner } from '../../components/Spinner/Spinner';
+import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
+import { AudioUpload } from '../../components/AudioUpload/AudioUpload';
 import _ from 'lodash';
-import { INotification } from '../../redux/modules/notifications';
-import { IConfigsRequest } from '../../redux/modules/configs';
-import { Notification } from '../../components/Notification';
+import { INotification } from '../../redux/modules/notifications/notifications';
+import { IConfigsRequest } from '../../redux/modules/configs/configs';
+import { Notification } from '../../components/Notification/Notification';
 import TextArea from 'antd/lib/input/TextArea';
-import { ColorPicker } from '../../components/ColorPicker';
-import { deleteHints, getHints, IHintsRequest, setHints } from '../../redux/modules/hints';
+import { ColorPicker } from '../../components/ColorPicker/ColorPicker';
+import { deleteHints, getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints';
 
 const { Content } = Layout;
 const { Option } = Select;
-const style = require('./style.scss');
+const style = require('./Settings.scss');
 
 interface IProps {
   settings: ISettingsRequest;

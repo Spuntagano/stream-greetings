@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SketchPicker } from 'react-color';
-const style = require('./style.scss');
+const style = require('./ColorPicker.scss');
 
 interface IState {
     displayColorPicker: boolean;

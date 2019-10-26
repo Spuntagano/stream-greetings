@@ -1,11 +1,11 @@
 // tslint:disable: max-line-length
 
 import * as React from 'react';
-import { INotification } from '../../redux/modules/notifications';
-import { ISettings } from '../../redux/modules/settings';
+import { INotification } from '../../redux/modules/notifications/notifications';
+import { ISettings } from '../../redux/modules/settings/settings';
 import { CensorSensor } from 'censor-sensor';
 
-const style = require('./style.scss');
+const style = require('./Notification.scss');
 
 interface IProps {
   settings: ISettings;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import moment from 'moment';
-import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters';
+import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters';
 import { IStore } from '../../redux/IStore';
 import Layout from 'antd/lib/layout';
 import Table from 'antd/lib/table';
@@ -14,11 +14,11 @@ import Highlighter from 'react-highlight-words';
 import { Spinner } from '../../components';
 import _ from 'lodash';
 import Icon from 'antd/lib/icon';
-import { IConfigsRequest } from '../../redux/modules/configs';
-import { INotification } from '../../redux/modules/notifications';
+import { IConfigsRequest } from '../../redux/modules/configs/configs';
+import { INotification } from '../../redux/modules/notifications/notifications';
 
 const { Content } = Layout;
-const style = require('./style.scss');
+const style = require('./Chatters.scss');
 
 interface IProps {
   chatters: IChattersRequest;

@@ -1,16 +1,16 @@
 // tslint:disable: max-line-length
 
 import * as React from 'react';
-import { INotification } from '../../redux/modules/notifications';
-import { ISettingsAction, getSettings, receiveSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings';
+import { INotification } from '../../redux/modules/notifications/notifications';
+import { ISettingsAction, getSettings, receiveSettings, ISettingsRequest, ISettings } from '../../redux/modules/settings/settings';
 import { connect } from 'react-redux';
 import { IStore } from '../../redux/IStore';
 import { Dispatch } from 'redux';
-import { getConfigs, IConfigsRequest } from '../../redux/modules/configs';
-import { Notification } from '../../components/Notification';
-import { getChatters, getLiveChatters, setChatter, IChattersRequest, IChatters, IChatter } from '../../redux/modules/chatters';
+import { getConfigs, IConfigsRequest } from '../../redux/modules/configs/configs';
+import { Notification } from '../../components/Notification/Notification';
+import { getChatters, getLiveChatters, setChatter, IChattersRequest, IChatters, IChatter } from '../../redux/modules/chatters/chatters';
 
-const style = require('./style.scss');
+const style = require('./Source.scss');
 
 interface IState {
   notifications: INotification[];
