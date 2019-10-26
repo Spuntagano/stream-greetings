@@ -116,7 +116,7 @@
     "react": "16.4.0",
     "react-color": "^2.17.3",
     "react-css-modules": "^4.7.11",
-    "react-dom": "16.4.0",
+    "react-dom": "16.4.2",
     "react-helmet": "^5.2.1",
     "react-highlight-words": "^0.16.0",
     "react-lines-ellipsis": "^0.14.1",
