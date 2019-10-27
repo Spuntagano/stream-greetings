@@ -1,44 +1,44 @@
-import * as React from 'react';
-import { SketchPicker } from 'react-color';
-const style = require('./ColorPicker.scss');
+import * as React from 'react'
+import { SketchPicker } from 'react-color'
+const style = require('./ColorPicker.scss')
 
 interface IState {
-    displayColorPicker: boolean;
+    displayColorPicker: boolean
 }
 
 interface IProps {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    label?: string;
-    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    label?: string
+    value: string
 }
 
 class ColorPickerC extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
-        super(props);
+        super(props)
 
         this.state = {
             displayColorPicker: false
-        };
+        }
     }
 
     private handleClick = () => {
-        this.setState({ displayColorPicker: !this.state.displayColorPicker });
+        this.setState({ displayColorPicker: !this.state.displayColorPicker })
     }
 
     private handleClose = () => {
-        this.setState({ displayColorPicker: false });
+        this.setState({ displayColorPicker: false })
     }
 
     private handleChange = (color: any, event: React.ChangeEvent<HTMLInputElement>) => {
-        const { onChange } = this.props;
+        const { onChange } = this.props
 
-        event.target.value = color.hex;
-        onChange(event);
+        event.target.value = color.hex
+        onChange(event)
     }
 
     public render() {
-        const { value, label } = this.props;
+        const { value, label } = this.props
 
         return (
             <div className={`${style.colorPicker} clearfix`}>
@@ -51,8 +51,8 @@ class ColorPickerC extends React.Component<IProps, IState> {
                     <SketchPicker color={value} onChange={this.handleChange} />
                 </div> : null}
             </div>
-        );
+        )
     }
 }
 
-export const ColorPicker = ColorPickerC as any;
+export const ColorPicker = ColorPickerC as any

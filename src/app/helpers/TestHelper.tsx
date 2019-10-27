@@ -1,18 +1,18 @@
-import * as React from 'react';
-import { mount, ComponentClass } from 'enzyme';
-import { Provider } from 'react-redux';
-import { createStore, Middleware, AnyAction, Store } from 'redux';
-import { MemoryRouter, Route } from 'react-router';
-import rootReducer from '../redux/reducers';
-import configureStore from 'redux-mock-store';
-import { IStore } from '../redux/IStore';
+import * as React from 'react'
+import { mount, ComponentClass } from 'enzyme'
+import { Provider } from 'react-redux'
+import { createStore, Middleware, AnyAction, Store } from 'redux'
+import { MemoryRouter, Route } from 'react-router'
+import rootReducer from '../redux/reducers'
+import configureStore from 'redux-mock-store'
+import { IStore } from '../redux/IStore'
 
-const fetchMock = require('fetch-mock');
+const fetchMock = require('fetch-mock')
 
 /** Redux Mock Store Configuration */
 
-const middlewares: Middleware[] = [];
-const mockStore = configureStore(middlewares);
+const middlewares: Middleware[] = []
+const mockStore = configureStore(middlewares)
 
 /** Render Component */
 function renderComponent<T>(
@@ -26,7 +26,7 @@ function renderComponent<T>(
         <Component {...props} />
       </MemoryRouter>
     </Provider>
-  );
+  )
 }
 
 function renderComponentWithRouter<T>(
@@ -44,13 +44,13 @@ function renderComponentWithRouter<T>(
         <Route path={pathToMatch} component={Component} />
       </Provider>
     </MemoryRouter>
-  );
+  )
 }
 
 function createState(s?: Partial<IStore>): IStore {
-  const state: any = {};
+  const state: any = {}
 
-  return { ...state, ...s };
+  return { ...state, ...s }
 }
 
-export { mockStore, fetchMock, renderComponent, createState, renderComponentWithRouter };
+export { mockStore, fetchMock, renderComponent, createState, renderComponentWithRouter }

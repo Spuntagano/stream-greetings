@@ -37,6 +37,7 @@
         "limit": 180, 
         "ignore-pattern": "http(s)://"
       }
-    ]
+    ],
+    "semicolon": [true, "never"]
   }
 }

@@ -1,88 +1,88 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-import moment from 'moment';
-import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters';
-import { IStore } from '../../redux/IStore';
-import Layout from 'antd/lib/layout';
-import Table from 'antd/lib/table';
-import Card from 'antd/lib/card';
-import Input from 'antd/lib/input';
-import Button from 'antd/lib/button';
-import notification from 'antd/lib/notification';
-import Highlighter from 'react-highlight-words';
-import { Spinner } from '../../components';
-import _ from 'lodash';
-import Icon from 'antd/lib/icon';
-import { IConfigsRequest } from '../../redux/modules/configs/configs';
-import { INotification } from '../../redux/modules/notifications/notifications';
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
+import moment from 'moment'
+import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters'
+import { IStore } from '../../redux/IStore'
+import Layout from 'antd/lib/layout'
+import Table from 'antd/lib/table'
+import Card from 'antd/lib/card'
+import Input from 'antd/lib/input'
+import Button from 'antd/lib/button'
+import notification from 'antd/lib/notification'
+import Highlighter from 'react-highlight-words'
+import { Spinner } from '../../components'
+import _ from 'lodash'
+import Icon from 'antd/lib/icon'
+import { IConfigsRequest } from '../../redux/modules/configs/configs'
+import { INotification } from '../../redux/modules/notifications/notifications'
 
-const { Content } = Layout;
-const style = require('./Chatters.scss');
+const { Content } = Layout
+const style = require('./Chatters.scss')
 
 interface IProps {
-  chatters: IChattersRequest;
-  configs: IConfigsRequest;
-  dispatch: Dispatch;
-  form: any;
+  chatters: IChattersRequest
+  configs: IConfigsRequest
+  dispatch: Dispatch
+  form: any
 }
 
 interface IState {
-  searchText: string;
+  searchText: string
 }
 
 interface IFilter {
-  selectedKeys: string[];
-  setSelectedKeys: (event: any[]) => void;
-  confirm: () => {};
-  clearFilters: () => {};
+  selectedKeys: string[]
+  setSelectedKeys: (event: any[]) => void
+  confirm: () => {}
+  clearFilters: () => {}
 }
 
 interface IColumn {
-  title: string;
-  dataIndex: string;
-  key: string;
-  sorter?: (a: IChatterTransformed, b: IChatterTransformed) => number;
-  defaultSortOrder?: 'descend' | 'ascend' | undefined;
-  className?: string;
+  title: string
+  dataIndex: string
+  key: string
+  sorter?: (a: IChatterTransformed, b: IChatterTransformed) => number
+  defaultSortOrder?: 'descend' | 'ascend' | undefined
+  className?: string
 }
 
 interface IChatterTransformed {
-  username: string;
-  firstChatMessage: string;
-  latestActionTimestamp: string;
-  latestActionDate: string;
-  key: string;
+  username: string
+  firstChatMessage: string
+  latestActionTimestamp: string
+  latestActionDate: string
+  key: string
 }
 
 class ChattersC extends React.Component<IProps, IState> {
-  private searchInput: Input | null;
+  private searchInput: Input | null
   constructor(props: IProps) {
-    super(props);
+    super(props)
 
-    this.searchInput = null;
+    this.searchInput = null
     this.state = {
       searchText: ''
-    };
+    }
   }
 
   public componentDidMount() {
-    const { dispatch, configs } = this.props;
+    const { dispatch, configs } = this.props
 
-    getChatters(dispatch, configs.data.profiles.twitch.name);
-    window.Streamlabs.onMessage(this.onMessage);
+    getChatters(dispatch, configs.data.profiles.twitch.name)
+    window.Streamlabs.onMessage(this.onMessage)
   }
 
   private onMessage = (event: MessageEvent) => {
-    const { dispatch } = this.props;
+    const { dispatch } = this.props
 
     if (event.type === 'NOTIFICATIONS') {
-      const chatters: IChatters = {};
+      const chatters: IChatters = {}
       event.data.forEach((notification: INotification) => {
-        chatters[notification.username] = notification.chatter;
-      });
+        chatters[notification.username] = notification.chatter
+      })
 
-      addChatters(dispatch, chatters);
+      addChatters(dispatch, chatters)
     }
   }
 
@@ -92,7 +92,7 @@ class ChattersC extends React.Component<IProps, IState> {
         <div style={{ padding: 8 }}>
           <Input
             ref={node => {
-              this.searchInput = node;
+              this.searchInput = node
             }}
             placeholder={`Search ${dataIndex}`}
             value={selectedKeys[0]}
@@ -125,7 +125,7 @@ class ChattersC extends React.Component<IProps, IState> {
       ),
       onFilterDropdownVisibleChange: (visible: boolean) => {
         if (visible) {
-          setTimeout(() => this.searchInput && this.searchInput.select());
+          setTimeout(() => this.searchInput && this.searchInput.select())
         }
       },
       render: (text: string) => (
@@ -136,19 +136,19 @@ class ChattersC extends React.Component<IProps, IState> {
           textToHighlight={(text || '').toString()}
         />
       )
-    };
+    }
   }
 
   private handleSearch = (selectedKeys: string[], confirm: () => void) => () => {
-    confirm();
-    this.setState({ searchText: selectedKeys[0] });
+    confirm()
+    this.setState({ searchText: selectedKeys[0] })
   }
 
-  private onSetSelectedKeys = (setSelectedKeys: (event: any[]) => void) => (e: any) => setSelectedKeys(e.target.value ? [e.target.value] : []);
+  private onSetSelectedKeys = (setSelectedKeys: (event: any[]) => void) => (e: any) => setSelectedKeys(e.target.value ? [e.target.value] : [])
 
   private handleReset = (clearFilters: () => void) => () => {
-    clearFilters();
-    this.setState({ searchText: '' });
+    clearFilters()
+    this.setState({ searchText: '' })
   }
 
   private getColumns = () => {
@@ -179,37 +179,37 @@ class ChattersC extends React.Component<IProps, IState> {
         key: 'replay',
         className: style.chattersReplay
       }
-    ];
+    ]
 
-    return columns;
+    return columns
   }
 
   private replay = (username: string) => async () => {
-    const { chatters } = this.props;
+    const { chatters } = this.props
 
     const notif: INotification = {
       username,
       chatter: chatters.data[username],
       timestamp: parseInt(chatters.data[username].firstChatMessageTimestamp || '', 10) || parseInt(chatters.data[username].firstJoinedTimestamp, 10),
       type: chatters.data[username].firstChatMessage ? 'MESSAGE' : 'JOIN'
-    };
+    }
 
     try {
-      await window.Streamlabs.postMessage('REPLAY', notif);
+      await window.Streamlabs.postMessage('REPLAY', notif)
       notification.open({
         message: 'Notification replay sent',
         icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
-      });
+      })
     } catch (e) {
       notification.open({
         message: 'An error as occured',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
-      });
+      })
     }
   }
 
   private dataTransformer = (username: string) => {
-    const { chatters } = this.props;
+    const { chatters } = this.props
 
     return {
       username,
@@ -218,11 +218,11 @@ class ChattersC extends React.Component<IProps, IState> {
       latestActionDate: moment(parseInt(chatters.data[username].firstChatMessageTimestamp || chatters.data[username].firstJoinedTimestamp, 10)).fromNow(),
       replay: <Icon onClick={this.replay(username)} type="redo" style={{ color: '#108ee9' }} />,
       key: username
-    };
+    }
   }
 
   public render() {
-    const { chatters } = this.props;
+    const { chatters } = this.props
 
     return (
       <Content className={style.chatters}>
@@ -235,7 +235,7 @@ class ChattersC extends React.Component<IProps, IState> {
           </div>}
         </Card>
       </Content>
-    );
+    )
   }
 }
 export const Chatters = connect(
@@ -243,7 +243,7 @@ export const Chatters = connect(
     return {
       chatters: state.chatters,
       configs: state.configs
-    };
+    }
   },
   (d: Dispatch<IChattersAction>) => ({ dispatch: d })
-)(ChattersC as any);
+)(ChattersC as any)

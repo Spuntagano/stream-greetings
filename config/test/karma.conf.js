@@ -1,9 +1,9 @@
-var path = require('path');
-var webpack = require('webpack');
-var postcssAssets = require('postcss-assets');
-var postcssNext = require('postcss-cssnext');
-var appConfig = require('../main');
-var stylelint = require('stylelint');
+var path = require('path')
+var webpack = require('webpack')
+var postcssAssets = require('postcss-assets')
+var postcssNext = require('postcss-cssnext')
+var appConfig = require('../main')
+var stylelint = require('stylelint')
 
 module.exports = function (config) {
   const conf = {
@@ -134,7 +134,7 @@ module.exports = function (config) {
                 postcssAssets({
                   relative: true,
                 }),
-              ];
+              ]
             },
           },
         }),
@@ -152,17 +152,17 @@ module.exports = function (config) {
     webpackServer: {
       noInfo: true,
     },
-  };
-
-  if (process.env.NODE_ENV === 'ci') {
-    conf.autoWatch = false;
-    conf.singleRun = true;
-    conf.browsers.push('Firefox');
-    conf.coverageIstanbulReporter.reports.push('lcov');
-  } else {
-    conf.coverageIstanbulReporter.reports.push('html');
-    conf.browsers.push('Chrome');
   }
 
-  config.set(conf);
-};
+  if (process.env.NODE_ENV === 'ci') {
+    conf.autoWatch = false
+    conf.singleRun = true
+    conf.browsers.push('Firefox')
+    conf.coverageIstanbulReporter.reports.push('lcov')
+  } else {
+    conf.coverageIstanbulReporter.reports.push('html')
+    conf.browsers.push('Chrome')
+  }
+
+  config.set(conf)
+}

@@ -1,18 +1,18 @@
-import * as React from 'react';
-import { Link, withRouter as router } from 'react-router-dom';
-import Menu from 'antd/lib/menu';
-import { RouteComponentProps } from 'react-router';
-import _ from 'lodash';
+import * as React from 'react'
+import { Link, withRouter as router } from 'react-router-dom'
+import Menu from 'antd/lib/menu'
+import { RouteComponentProps } from 'react-router'
+import _ from 'lodash'
 
-const style = require('./Navigation.scss');
+const style = require('./Navigation.scss')
 
 interface IProps {
-  className?: string;
+  className?: string
 }
 
 class NavigationC extends React.Component<IProps & RouteComponentProps> {
   public render() {
-    const { location, className } = this.props;
+    const { location, className } = this.props
 
     return (
       <div className={`${style.Navigation} ${className}`}>
@@ -31,8 +31,8 @@ class NavigationC extends React.Component<IProps & RouteComponentProps> {
           </Menu.Item>
         </Menu>
       </div>
-    );
+    )
   }
 }
 
-export const Navigation = router(NavigationC) as any;
+export const Navigation = router(NavigationC) as any

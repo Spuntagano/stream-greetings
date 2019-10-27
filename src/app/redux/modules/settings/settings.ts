@@ -1,94 +1,94 @@
-import { Dispatch } from 'redux';
+import { Dispatch } from 'redux'
 
 export interface ISettings {
-  showImage: boolean;
-  playSound: boolean;
-  profanityFilter: boolean;
-  showFirstJoinedNotification: boolean;
-  showFirstChatMessageNotification: boolean;
-  notificationImageUrl: string;
-  notificationAudioUrl: string;
-  fontSize: number;
-  fontWeight: number;
-  lineHeight: number;
-  firstJoinedMessageTemplate: string;
-  firstMessageMessageTemplate: string;
-  primaryColor: string;
-  secondaryColor: string;
-  fontFamily: string;
+  showImage: boolean
+  playSound: boolean
+  profanityFilter: boolean
+  showFirstJoinedNotification: boolean
+  showFirstChatMessageNotification: boolean
+  notificationImageUrl: string
+  notificationAudioUrl: string
+  fontSize: number
+  fontWeight: number
+  lineHeight: number
+  firstJoinedMessageTemplate: string
+  firstMessageMessageTemplate: string
+  primaryColor: string
+  secondaryColor: string
+  fontFamily: string
 }
 
 export interface ISettingsRequest {
-  isFetching: boolean;
-  isSaving: boolean;
-  isLoaded: boolean;
-  isDeleting: boolean;
-  error?: boolean;
-  message?: any;
-  data: ISettings;
+  isFetching: boolean
+  isSaving: boolean
+  isLoaded: boolean
+  isDeleting: boolean
+  error?: boolean
+  message?: any
+  data: ISettings
 }
 
 /** Action Types */
-export const GET_SETTINGS_REQUEST = 'GET_SETTINGS_REQUEST';
-export const SET_SETTINGS_REQUEST = 'SET_SETTINGS_REQUEST';
-export const DELETE_SETTINGS_REQUEST = 'DELETE_SETTINGS_REQUEST';
-export const GET_SETTINGS_SUCCESS = 'GET_SETTINGS_SUCCESS';
-export const SET_SETTINGS_SUCCESS = 'SET_SETTINGS_SUCCESS';
-export const DELETE_SETTINGS_SUCCESS = 'DELETE_SETTINGS_SUCCESS';
-export const GET_SETTINGS_FAILURE = 'GET_SETTINGS_FAILURE';
-export const SET_SETTINGS_FAILURE = 'SET_SETTINGS_FAILURE';
-export const DELETE_SETTINGS_FAILURE = 'DELETE_SETTINGS_FAILURE';
-export const RECEIVE_SETTINGS = 'RECEIVE_SETTINGS';
+export const GET_SETTINGS_REQUEST = 'GET_SETTINGS_REQUEST'
+export const SET_SETTINGS_REQUEST = 'SET_SETTINGS_REQUEST'
+export const DELETE_SETTINGS_REQUEST = 'DELETE_SETTINGS_REQUEST'
+export const GET_SETTINGS_SUCCESS = 'GET_SETTINGS_SUCCESS'
+export const SET_SETTINGS_SUCCESS = 'SET_SETTINGS_SUCCESS'
+export const DELETE_SETTINGS_SUCCESS = 'DELETE_SETTINGS_SUCCESS'
+export const GET_SETTINGS_FAILURE = 'GET_SETTINGS_FAILURE'
+export const SET_SETTINGS_FAILURE = 'SET_SETTINGS_FAILURE'
+export const DELETE_SETTINGS_FAILURE = 'DELETE_SETTINGS_FAILURE'
+export const RECEIVE_SETTINGS = 'RECEIVE_SETTINGS'
 
 export interface IActionGetSettingsRequest {
-  type: typeof GET_SETTINGS_REQUEST;
+  type: typeof GET_SETTINGS_REQUEST
 }
 
 export interface IActionSetSettingsRequest {
-  type: typeof SET_SETTINGS_REQUEST;
+  type: typeof SET_SETTINGS_REQUEST
 }
 
 export interface IActionDeleteSettingsRequest {
-  type: typeof DELETE_SETTINGS_REQUEST;
+  type: typeof DELETE_SETTINGS_REQUEST
 }
 
 export interface IActionGetSettingsSuccess {
-  type: typeof GET_SETTINGS_SUCCESS;
-  data: ISettings;
+  type: typeof GET_SETTINGS_SUCCESS
+  data: ISettings
 }
 
 export interface IActionSetSettingsSuccess {
-  type: typeof SET_SETTINGS_SUCCESS;
-  data: ISettings;
+  type: typeof SET_SETTINGS_SUCCESS
+  data: ISettings
 }
 
 export interface IActionDeleteSettingsSuccess {
-  type: typeof DELETE_SETTINGS_SUCCESS;
+  type: typeof DELETE_SETTINGS_SUCCESS
 }
 
 export interface IActionGetSettingsFailure {
-  type: typeof GET_SETTINGS_FAILURE;
-  message: string;
+  type: typeof GET_SETTINGS_FAILURE
+  message: string
 }
 
 export interface IActionSetSettingsFailure {
-  type: typeof SET_SETTINGS_FAILURE;
-  message: string;
+  type: typeof SET_SETTINGS_FAILURE
+  message: string
 }
 
 export interface IActionDeleteSettingsFailure {
-  type: typeof DELETE_SETTINGS_FAILURE;
-  message: string;
+  type: typeof DELETE_SETTINGS_FAILURE
+  message: string
 }
 
 export interface IActionReceiveSettings {
-  type: typeof RECEIVE_SETTINGS;
-  data: ISettings;
+  type: typeof RECEIVE_SETTINGS
+  data: ISettings
 }
 
 export type ISettingsAction = IActionGetSettingsRequest | IActionGetSettingsSuccess | IActionGetSettingsFailure |
   IActionSetSettingsRequest | IActionSetSettingsSuccess | IActionSetSettingsFailure | IActionDeleteSettingsRequest | IActionDeleteSettingsSuccess | IActionDeleteSettingsFailure |
-  IActionReceiveSettings;
+  IActionReceiveSettings
 
 /** Initial State */
 const initialState: ISettingsRequest = {
@@ -113,7 +113,7 @@ const initialState: ISettingsRequest = {
     secondaryColor: '#00ffff',
     fontFamily: 'arial'
   },
-};
+}
 
 /** Reducer */
 export function settingsReducer(state = initialState, action: ISettingsAction) {
@@ -122,19 +122,19 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
       return {
         ...state,
         isFetching: true
-      };
+      }
 
     case SET_SETTINGS_REQUEST:
       return {
         ...state,
         isSaving: true
-      };
+      }
 
     case DELETE_SETTINGS_REQUEST:
       return {
         ...state,
         isDeleting: true
-      };
+      }
 
     case GET_SETTINGS_SUCCESS:
       return {
@@ -146,7 +146,7 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
           ...action.data
         },
         error: false
-      };
+      }
 
     case SET_SETTINGS_SUCCESS:
       return {
@@ -154,7 +154,7 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
         isSaving: false,
         data: action.data,
         error: false
-      };
+      }
 
     case DELETE_SETTINGS_SUCCESS:
       return {
@@ -162,7 +162,7 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
         isDeleting: false,
         data: initialState.data,
         error: false
-      };
+      }
 
     case GET_SETTINGS_FAILURE:
       return {
@@ -170,105 +170,105 @@ export function settingsReducer(state = initialState, action: ISettingsAction) {
         isFetching: false,
         message: action.message,
         error: true
-      };
+      }
 
     case SET_SETTINGS_FAILURE:
       return {
         ...state,
         isSaving: false,
         message: action.message
-      };
+      }
 
     case DELETE_SETTINGS_FAILURE:
       return {
         ...state,
         isDeleting: false,
         message: action.message
-      };
+      }
 
     case RECEIVE_SETTINGS:
       return {
         ...state,
         data: action.data
-      };
+      }
 
     default:
-      return state;
+      return state
   }
 }
 
 /** Async Action Creator */
 export function getSettings(dispatch: Dispatch<ISettingsAction>) {
-  dispatch(getSettingsRequest());
+  dispatch(getSettingsRequest())
 
   return new Promise(async (resolve, reject) => {
     try {
-      const settings = await window.Streamlabs.userSettings.get('settings') || initialState.data;
-      dispatch(getSettingsSuccess(settings));
-      resolve(settings);
+      const settings = await window.Streamlabs.userSettings.get('settings') || initialState.data
+      dispatch(getSettingsSuccess(settings))
+      resolve(settings)
     } catch (e) {
-      dispatch(getSettingsFailure(e.message));
-      reject(e);
+      dispatch(getSettingsFailure(e.message))
+      reject(e)
     }
-  });
+  })
 }
 
 /** Async Action Creator */
 export function setSettings(dispatch: Dispatch<ISettingsAction>, data: ISettings) {
-  dispatch(setSettingsRequest());
+  dispatch(setSettingsRequest())
 
   return new Promise(async (resolve, reject) => {
     try {
-      await window.Streamlabs.userSettings.set('settings', data);
-      dispatch(setSettingsSuccess(data));
-      resolve(data);
+      await window.Streamlabs.userSettings.set('settings', data)
+      dispatch(setSettingsSuccess(data))
+      resolve(data)
     } catch (e) {
-      dispatch(setSettingsFailure(e.message));
-      reject(e);
+      dispatch(setSettingsFailure(e.message))
+      reject(e)
     }
-  });
+  })
 }
 
 /** Async Action Creator */
 export function deleteSettings(dispatch: Dispatch<ISettingsAction>) {
-  dispatch(deleteSettingsRequest());
+  dispatch(deleteSettingsRequest())
 
   return new Promise(async (resolve, reject) => {
     try {
-      await window.Streamlabs.userSettings.delete('settings');
-      dispatch(deleteSettingsSuccess());
-      resolve(initialState.data);
+      await window.Streamlabs.userSettings.delete('settings')
+      dispatch(deleteSettingsSuccess())
+      resolve(initialState.data)
     } catch (e) {
-      dispatch(deleteSettingsFailure(e.message));
-      reject(e);
+      dispatch(deleteSettingsFailure(e.message))
+      reject(e)
     }
-  });
+  })
 }
 
 /** Async Action Creator */
 export function receiveSettings(dispatch: Dispatch<ISettingsAction>, data: ISettings) {
-  dispatch(receiveSettingsAction(data));
+  dispatch(receiveSettingsAction(data))
 }
 
 /** Action Creator */
 export function getSettingsRequest(): IActionGetSettingsRequest {
   return {
     type: GET_SETTINGS_REQUEST,
-  };
+  }
 }
 
 /** Action Creator */
 export function setSettingsRequest(): IActionSetSettingsRequest {
   return {
     type: SET_SETTINGS_REQUEST,
-  };
+  }
 }
 
 /** Action Creator */
 export function deleteSettingsRequest(): IActionDeleteSettingsRequest {
   return {
     type: DELETE_SETTINGS_REQUEST,
-  };
+  }
 }
 
 /** Action Creator */
@@ -276,7 +276,7 @@ export function getSettingsSuccess(data: ISettings): IActionGetSettingsSuccess {
   return {
     type: GET_SETTINGS_SUCCESS,
     data,
-  };
+  }
 }
 
 /** Action Creator */
@@ -284,14 +284,14 @@ export function setSettingsSuccess(data: ISettings): IActionSetSettingsSuccess {
   return {
     type: SET_SETTINGS_SUCCESS,
     data,
-  };
+  }
 }
 
 /** Action Creator */
 export function deleteSettingsSuccess(): IActionDeleteSettingsSuccess {
   return {
     type: DELETE_SETTINGS_SUCCESS
-  };
+  }
 }
 
 /** Action Creator */
@@ -299,7 +299,7 @@ export function getSettingsFailure(message: string): IActionGetSettingsFailure {
   return {
     type: GET_SETTINGS_FAILURE,
     message,
-  };
+  }
 }
 
 /** Action Creator */
@@ -307,7 +307,7 @@ export function setSettingsFailure(message: string): IActionSetSettingsFailure {
   return {
     type: SET_SETTINGS_FAILURE,
     message,
-  };
+  }
 }
 
 /** Action Creator */
@@ -315,7 +315,7 @@ export function deleteSettingsFailure(message: string): IActionDeleteSettingsFai
   return {
     type: DELETE_SETTINGS_FAILURE,
     message,
-  };
+  }
 }
 
 /** Action Creator */
@@ -323,5 +323,5 @@ export function receiveSettingsAction(data: ISettings): IActionReceiveSettings {
   return {
     type: RECEIVE_SETTINGS,
     data,
-  };
+  }
 }

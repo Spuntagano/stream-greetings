@@ -1,13 +1,13 @@
-const path = require("path");
-const webpack = require("webpack");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const fs = require('fs-extra');
-const postcssAssets = require('postcss-assets');
-const postcssNext = require('postcss-cssnext');
-const stylelint = require('stylelint');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
-const darkTheme = require('@ant-design/dark-theme');
+const path = require("path")
+const webpack = require("webpack")
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const fs = require('fs-extra')
+const postcssAssets = require('postcss-assets')
+const postcssNext = require('postcss-cssnext')
+const stylelint = require('stylelint')
+const ManifestPlugin = require('webpack-manifest-plugin')
+const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin
+const darkTheme = require('@ant-design/dark-theme')
 
 
 module.exports = (_env, argv) => {
@@ -22,9 +22,9 @@ module.exports = (_env, argv) => {
             outputHtml: 'widget.html',
             build: true
         }
-    };
+    }
 
-    let entry = {};
+    let entry = {}
 
     // edit webpack plugins here!
     let plugins = [
@@ -42,11 +42,11 @@ module.exports = (_env, argv) => {
                 API_URL_BASE_PATH: 'https://ga7nmsy60j.execute-api.ca-central-1.amazonaws.com/test'
             }),
         })
-    ];
+    ]
 
     for (name in entryPoints) {
         if (entryPoints[name].build) {
-            entry[name] = entryPoints[name].path;
+            entry[name] = entryPoints[name].path
         }
     }
 
@@ -141,7 +141,7 @@ module.exports = (_env, argv) => {
             pathinfo: true,
         },
         plugins
-    };
+    }
 
     if (argv.mode === 'development') {
         config.devServer = {
@@ -155,11 +155,11 @@ module.exports = (_env, argv) => {
         }
     }
 
-    return config;
-};
+    return config
+}
 
-fs.copySync('./src/favicon.ico', './build/public/favicon.ico');
-fs.copySync('./src/settings.html', './build/public/settings.html');
-fs.copySync('./src/source.html', './build/public/source.html');
-fs.copySync('./src/banner.png', './build/public/banner.png');
-fs.copySync('./src/assets', './build/public/assets');
+fs.copySync('./src/favicon.ico', './build/public/favicon.ico')
+fs.copySync('./src/settings.html', './build/public/settings.html')
+fs.copySync('./src/source.html', './build/public/source.html')
+fs.copySync('./src/banner.png', './build/public/banner.png')
+fs.copySync('./src/assets', './build/public/assets')

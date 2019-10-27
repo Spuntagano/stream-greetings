@@ -1,6 +1,6 @@
 interface Window {
-    Streamlabs: any;
+    Streamlabs: any
 }
 
-declare module 'react-lines-ellipsis';
-declare module 'react-color';
+declare module 'react-lines-ellipsis'
+declare module 'react-color'

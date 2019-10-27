@@ -1,150 +1,150 @@
-import appConfig from '../../../../config/main';
-import * as React from 'react';
-import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-import { getConfigs, IConfigsAction, IConfigsRequest } from '../../redux/modules/configs/configs';
-import { IStore } from '../../redux/IStore';
-import { Navigation } from '../../components';
-import { renderRoutes } from 'react-router-config';
-import { routes } from '../../routes';
-import Icon from 'antd/lib/icon';
-import notification from 'antd/lib/notification';
-import Layout from 'antd/lib/layout';
-import Modal from 'antd/lib/Modal';
-import Tooltip from 'antd/lib/tooltip';
-import Carousel from 'antd/lib/carousel';
-import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints';
+import appConfig from '../../../../config/main'
+import * as React from 'react'
+import { Helmet } from 'react-helmet'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
+import { getConfigs, IConfigsAction, IConfigsRequest } from '../../redux/modules/configs/configs'
+import { IStore } from '../../redux/IStore'
+import { Navigation } from '../../components'
+import { renderRoutes } from 'react-router-config'
+import { routes } from '../../routes'
+import Icon from 'antd/lib/icon'
+import notification from 'antd/lib/notification'
+import Layout from 'antd/lib/layout'
+import Modal from 'antd/lib/Modal'
+import Tooltip from 'antd/lib/tooltip'
+import Carousel from 'antd/lib/carousel'
+import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints'
 
-const { Header } = Layout;
-const style = require('./App.scss');
+const { Header } = Layout
+const style = require('./App.scss')
 
 interface IProps {
-  dispatch: Dispatch;
-  configs: IConfigsRequest;
-  hints: IHintsRequest;
+  dispatch: Dispatch
+  configs: IConfigsRequest
+  hints: IHintsRequest
 }
 
 interface IState {
-  loaded: boolean;
-  sourceLoaded: false;
-  theme: string;
-  introCarouselCurrentSlide: number;
+  loaded: boolean
+  sourceLoaded: false
+  theme: string
+  introCarouselCurrentSlide: number
 }
 
 interface IEvents {
-  [s: string]: string[];
+  [s: string]: string[]
 }
 
 class AppC extends React.Component<IProps, IState> {
-  private streamlabsOBS: any;
-  private sourcesQueue: any[];
-  private carousel: Carousel | null;
-  private slides: React.ReactElement[];
+  private streamlabsOBS: any
+  private sourcesQueue: any[]
+  private carousel: Carousel | null
+  private slides: React.ReactElement[]
 
   constructor(props: IProps) {
-    super(props);
+    super(props)
 
-    this.sourcesQueue = [];
-    this.streamlabsOBS = window.streamlabsOBS;
+    this.sourcesQueue = []
+    this.streamlabsOBS = window.streamlabsOBS
     this.state = {
       loaded: false,
       sourceLoaded: false,
       theme: 'night',
       introCarouselCurrentSlide: 0
-    };
-    this.carousel = null;
+    }
+    this.carousel = null
     this.slides = [
       <div key="1">1</div>,
       <div key="2">2</div>,
       <div key="3">3</div>,
       <div key="3">3</div>
-    ];
+    ]
   }
 
   public async componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch } = this.props
 
     try {
-      await getConfigs(dispatch);
-      await getHints(dispatch);
-      this.setState({ loaded: true });
+      await getConfigs(dispatch)
+      await getHints(dispatch)
+      this.setState({ loaded: true })
     } catch (e) {
       notification.open({
         message: 'An error as occured',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
         duration: 0
-      });
+      })
     }
 
-    if (!this.streamlabsOBS) { return; }
+    if (!this.streamlabsOBS) { return }
     this.streamlabsOBS.apiReady.then(() => {
       this.streamlabsOBS.v1.Theme.getTheme().then((theme: any) => {
-        this.setState({ theme });
-      });
+        this.setState({ theme })
+      })
 
       this.streamlabsOBS.v1.Theme.themeChanged((theme: any) => {
-        this.setState({ theme });
-      });
+        this.setState({ theme })
+      })
 
       const events: IEvents = {
         Sources: ['sourceAdded', 'sourceRemoved', 'sourceUpdated'],
         Scenes: ['sceneAdded', 'sceneRemoved', 'sceneSwitched']
-      };
+      }
 
-      this.detectIfSourceIsInScene();
+      this.detectIfSourceIsInScene()
       Object.keys(events).forEach((key: string) => {
         events[key].forEach((event: string) => {
-          this.streamlabsOBS.v1[key][event](this.detectIfSourceIsInScene);
-        });
-      });
-    });
+          this.streamlabsOBS.v1[key][event](this.detectIfSourceIsInScene)
+        })
+      })
+    })
   }
 
   private detectIfSourceIsInScene = async () => {
-    const scene = await this.streamlabsOBS.v1.Scenes.getActiveScene();
-    const sources = await this.streamlabsOBS.v1.Sources.getAppSources();
-    let sourceLoaded = false;
+    const scene = await this.streamlabsOBS.v1.Scenes.getActiveScene()
+    const sources = await this.streamlabsOBS.v1.Sources.getAppSources()
+    let sourceLoaded = false
 
-    this.nodeCrawler(scene.nodes);
+    this.nodeCrawler(scene.nodes)
     this.sourcesQueue.forEach((node: any) => {
       sources.forEach((source: any) => {
         if (node.sourceId === source.id) {
-          sourceLoaded = true;
+          sourceLoaded = true
         }
-      });
-    });
+      })
+    })
 
-    this.setState({ sourceLoaded });
-    this.sourcesQueue = [];
+    this.setState({ sourceLoaded })
+    this.sourcesQueue = []
   }
 
   private async nodeCrawler(nodes: any[]) {
     nodes.forEach(async (node: any) => {
       if (node.type === 'folder') {
-        this.nodeCrawler(node);
+        this.nodeCrawler(node)
       } else if (node.type === 'scene_item') {
-        this.sourcesQueue.push(node);
+        this.sourcesQueue.push(node)
       }
-    });
+    })
   }
 
   private closeIntroModal = () => {
-    const { dispatch, hints } = this.props;
+    const { dispatch, hints } = this.props
     setHints(dispatch, {
       ...hints.data,
       showIntroModal: false
-    });
+    })
   }
 
   private nextIntroModal = () => {
     if (this.state.introCarouselCurrentSlide === this.slides.length - 1) {
-      this.closeIntroModal();
-      return;
+      this.closeIntroModal()
+      return
     }
 
     if (this.carousel) {
-      this.carousel.next();
+      this.carousel.next()
     }
   }
 
@@ -152,7 +152,7 @@ class AppC extends React.Component<IProps, IState> {
   private onCarouselBeforeChange = (currentSlide: number, nextSlide: number) => {
     this.setState({
       introCarouselCurrentSlide: nextSlide
-    });
+    })
   }
 
   public render() {
@@ -197,7 +197,7 @@ class AppC extends React.Component<IProps, IState> {
           </div>
         </Modal>
       </Layout>
-    );
+    )
   }
 }
 
@@ -206,7 +206,7 @@ export const App = connect(
     return {
       configs: state.configs,
       hints: state.hints
-    };
+    }
   },
   (d: Dispatch<IConfigsAction>) => ({ dispatch: d })
-)(AppC);
+)(AppC)

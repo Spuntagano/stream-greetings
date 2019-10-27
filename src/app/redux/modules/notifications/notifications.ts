@@ -1,8 +1,8 @@
-import { IChatter } from '../chatters/chatters';
+import { IChatter } from '../chatters/chatters'
 
 export interface INotification {
-  type: string;
-  username: string;
-  chatter: IChatter;
-  timestamp: number;
+  type: string
+  username: string
+  chatter: IChatter
+  timestamp: number
 }

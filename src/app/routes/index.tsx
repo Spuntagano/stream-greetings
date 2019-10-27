@@ -1,4 +1,4 @@
-import { App, Settings, Chatters } from '../containers';
+import { App, Settings, Chatters } from '../containers'
 
 export const routes = [
   {
@@ -14,4 +14,4 @@ export const routes = [
       }
     ],
   },
-];
+]
