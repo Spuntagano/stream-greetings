@@ -2,6 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import moment from 'moment'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters'
 import { IStore } from '../../redux/IStore'
 import Layout from 'antd/lib/layout'
@@ -208,7 +209,7 @@ class ChattersC extends React.Component<IProps, IState> {
     }
   }
 
-  private dataTransformer = (username: string) => {
+  private tableDataTransformer = (username: string) => {
     const { chatters } = this.props
 
     return {
@@ -221,6 +222,56 @@ class ChattersC extends React.Component<IProps, IState> {
     }
   }
 
+  private groupDataByTimeframe = (data: any[], prop: string, timeframe: number, startTime: number, endTime: number) => {
+    const sortedData = data.sort((a, b) => a[prop] - b[prop])
+    const dataByTimeframe: any = {}
+    let currentTime = startTime
+    let index = 0
+
+    while (currentTime < endTime) {
+      dataByTimeframe[currentTime] = 0
+      while (index < sortedData.length && sortedData[index][prop] < startTime) {
+        index++
+      }
+
+      while (index < sortedData.length && sortedData[index][prop] < currentTime) {
+        if (sortedData[index][prop]) {
+          dataByTimeframe[currentTime]++
+        }
+
+        index++
+      }
+
+      currentTime += timeframe
+    }
+
+    return dataByTimeframe
+  }
+
+  private chartDataTransformer = () => {
+    const { chatters } = this.props
+
+    const chattersArray = Object.keys(chatters.data).map((username: string) => {
+      return {
+        ...chatters.data[username],
+        firstJoinedTimestamp: parseInt(chatters.data[username].firstJoinedTimestamp, 10),
+        firstChatMessageTimestamp: parseInt(chatters.data[username].firstChatMessageTimestamp || '0', 10),
+        username,
+      }
+    })
+
+    const firstJoinedGroupedData = this.groupDataByTimeframe(chattersArray, 'firstJoinedTimestamp', 60 * 60 * 1000, moment().startOf('day').valueOf(),
+            moment().local().endOf('day').valueOf())
+    const firstChatMessageGroupedData = this.groupDataByTimeframe(chattersArray, 'firstChatMessageTimestamp', 60 * 60 * 1000, moment().startOf('day').valueOf(),
+           moment().local().endOf('day').valueOf())
+
+    return Object.keys(firstJoinedGroupedData).map((timestamp) => ({
+      name: moment(parseInt(timestamp, 10)).format('HH:mm'),
+      firstNewViewers: firstJoinedGroupedData[timestamp],
+      firstNewMessages: firstChatMessageGroupedData[timestamp]
+    }))
+  }
+
   public render() {
     const { chatters } = this.props
 
@@ -231,7 +282,19 @@ class ChattersC extends React.Component<IProps, IState> {
           {chatters.error && <h2>Error loading chatters</h2>}
           {!chatters.isFetching && !chatters.error && <div>
             <h1>Chatters</h1>
-            <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.dataTransformer)} columns={this.getColumns()} />
+            <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.tableDataTransformer)} columns={this.getColumns()} />
+            <ResponsiveContainer height={400} width="100%">
+              <LineChart width={730} height={250} data={this.chartDataTransformer()}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="linear" dataKey="firstNewViewers" stroke="#8884d8" />
+                <Line type="linear" dataKey="firstNewMessages" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>}
         </Card>
       </Content>

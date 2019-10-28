@@ -98,6 +98,7 @@
   },
   "dependencies": {
     "@ant-design/dark-theme": "^1.0.3",
+    "@types/recharts": "^1.8.0",
     "antd": "^3.24.2",
     "babel-polyfill": "^6.26.0",
     "censor-sensor": "^1.0.5",
@@ -125,6 +126,7 @@
     "react-router-config": "^1.0.0-beta.4",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
+    "recharts": "^1.8.5",
     "redux": "^4.0.4",
     "serialize-javascript": "1.5.0",
     "serve-favicon": "^2.3.2"
