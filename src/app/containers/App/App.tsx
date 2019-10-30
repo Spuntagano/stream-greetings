@@ -12,7 +12,6 @@ import Icon from 'antd/lib/icon'
 import notification from 'antd/lib/notification'
 import Layout from 'antd/lib/layout'
 import Modal from 'antd/lib/Modal'
-import Tooltip from 'antd/lib/tooltip'
 import Carousel from 'antd/lib/carousel'
 import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints'
 
@@ -27,30 +26,18 @@ interface IProps {
 
 interface IState {
   loaded: boolean
-  sourceLoaded: false
-  theme: string
   introCarouselCurrentSlide: number
 }
 
-interface IEvents {
-  [s: string]: string[]
-}
-
 class AppC extends React.Component<IProps, IState> {
-  private streamlabsOBS: any
-  private sourcesQueue: any[]
   private carousel: Carousel | null
   private slides: React.ReactElement[]
 
   constructor(props: IProps) {
     super(props)
 
-    this.sourcesQueue = []
-    this.streamlabsOBS = window.streamlabsOBS
     this.state = {
       loaded: false,
-      sourceLoaded: false,
-      theme: 'night',
       introCarouselCurrentSlide: 0
     }
     this.carousel = null
@@ -76,57 +63,6 @@ class AppC extends React.Component<IProps, IState> {
         duration: 0
       })
     }
-
-    if (!this.streamlabsOBS) { return }
-    this.streamlabsOBS.apiReady.then(() => {
-      this.streamlabsOBS.v1.Theme.getTheme().then((theme: any) => {
-        this.setState({ theme })
-      })
-
-      this.streamlabsOBS.v1.Theme.themeChanged((theme: any) => {
-        this.setState({ theme })
-      })
-
-      const events: IEvents = {
-        Sources: ['sourceAdded', 'sourceRemoved', 'sourceUpdated'],
-        Scenes: ['sceneAdded', 'sceneRemoved', 'sceneSwitched']
-      }
-
-      this.detectIfSourceIsInScene()
-      Object.keys(events).forEach((key: string) => {
-        events[key].forEach((event: string) => {
-          this.streamlabsOBS.v1[key][event](this.detectIfSourceIsInScene)
-        })
-      })
-    })
-  }
-
-  private detectIfSourceIsInScene = async () => {
-    const scene = await this.streamlabsOBS.v1.Scenes.getActiveScene()
-    const sources = await this.streamlabsOBS.v1.Sources.getAppSources()
-    let sourceLoaded = false
-
-    this.nodeCrawler(scene.nodes)
-    this.sourcesQueue.forEach((node: any) => {
-      sources.forEach((source: any) => {
-        if (node.sourceId === source.id) {
-          sourceLoaded = true
-        }
-      })
-    })
-
-    this.setState({ sourceLoaded })
-    this.sourcesQueue = []
-  }
-
-  private async nodeCrawler(nodes: any[]) {
-    nodes.forEach(async (node: any) => {
-      if (node.type === 'folder') {
-        this.nodeCrawler(node)
-      } else if (node.type === 'scene_item') {
-        this.sourcesQueue.push(node)
-      }
-    })
   }
 
   private closeIntroModal = () => {
@@ -157,25 +93,13 @@ class AppC extends React.Component<IProps, IState> {
 
   public render() {
     return this.state.loaded && (
-      <Layout className={style.AppContainer}>
+      <Layout>
         <Helmet {...appConfig.app} {...appConfig.app.head} />
         <Header style={{
           backgroundColor: '#30303d',
           padding: 0
         }}>
-          <Navigation className={style.navigation} />
-          <div className={style.sourceLoaded}>
-            {this.state.sourceLoaded && <Tooltip placement="bottomRight" title="New users are being recorded">
-              <span style={{color: '#52c41a'}}>Status: Active</span>
-            </Tooltip>}
-            {!this.state.sourceLoaded &&
-              <Tooltip
-                placement="bottomRight"
-                title="New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene"
-              >
-                <span style={{color: '#f5222d'}}>Status: Inactive</span>
-              </Tooltip>}
-          </div>
+          <Navigation />
         </Header>
         <Layout className={style.container}>
           {renderRoutes(routes[0].routes)}

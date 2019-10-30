@@ -2,15 +2,19 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import moment from 'moment'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import Select from 'antd/lib/select'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip as ChartTooltip, Legend, ResponsiveContainer } from 'recharts'
 import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters'
 import { IStore } from '../../redux/IStore'
+import Tooltip from 'antd/lib/tooltip'
 import Layout from 'antd/lib/layout'
 import Table from 'antd/lib/table'
 import Card from 'antd/lib/card'
 import Input from 'antd/lib/input'
 import Button from 'antd/lib/button'
 import notification from 'antd/lib/notification'
+import Col from 'antd/lib/col'
+import Row from 'antd/lib/row'
 import Highlighter from 'react-highlight-words'
 import { Spinner } from '../../components'
 import _ from 'lodash'
@@ -18,18 +22,29 @@ import Icon from 'antd/lib/icon'
 import { IConfigsRequest } from '../../redux/modules/configs/configs'
 import { INotification } from '../../redux/modules/notifications/notifications'
 
+const { Option } = Select
 const { Content } = Layout
 const style = require('./Chatters.scss')
+
+interface IGraphSelect {
+  label: string
+  interval: number
+  startTime: number
+  endTime: number
+  format: string
+}
 
 interface IProps {
   chatters: IChattersRequest
   configs: IConfigsRequest
   dispatch: Dispatch
-  form: any
+  form: IGraphSelect
 }
 
 interface IState {
-  searchText: string
+  searchText: string,
+  selectedTimeFrame: number,
+  sourceLoaded: boolean
 }
 
 interface IFilter {
@@ -56,14 +71,68 @@ interface IChatterTransformed {
   key: string
 }
 
+interface IEvents {
+  [s: string]: string[]
+}
+
+const timeFrames: IGraphSelect[] = [{
+  label: 'Today',
+  interval: 60 * 60 * 1000,
+  startTime: moment().startOf('day').valueOf(),
+  endTime: moment().endOf('day').valueOf(),
+  format: 'HH:mm'
+},
+{
+  label: 'Yesterday',
+  interval: 60 * 60 * 1000,
+  startTime: moment().subtract(1, 'day').startOf('day').valueOf(),
+  endTime: moment().subtract(1, 'day').endOf('day').valueOf(),
+  format: 'HH:mm'
+},
+{
+  label: 'This week',
+  interval: 60 * 60 * 12 * 1000,
+  startTime: moment().startOf('week').valueOf(),
+  endTime: moment().endOf('week').valueOf(),
+  format: 'D:MMM HH:'
+},
+{
+  label: 'Last week',
+  interval: 60 * 60 * 12 * 1000,
+  startTime: moment().subtract(1, 'week').startOf('week').valueOf(),
+  endTime: moment().subtract(1, 'week').endOf('week').valueOf(),
+  format: 'D:MMM HH:mm'
+},
+{
+  label: 'This month',
+  interval: 60 * 60 * 24 * 1000,
+  startTime: moment().startOf('month').valueOf(),
+  endTime: moment().endOf('month').valueOf(),
+  format: 'D:MMM'
+},
+{
+  label: 'Last month',
+  interval: 60 * 60 * 24 * 1000,
+  startTime: moment().subtract(1, 'month').startOf('month').valueOf(),
+  endTime: moment().subtract(1, 'month').endOf('month').valueOf(),
+  format: 'D:MMM'
+}]
+
 class ChattersC extends React.Component<IProps, IState> {
   private searchInput: Input | null
+  private streamlabsOBS: any
+  private sourcesQueue: any[]
+
   constructor(props: IProps) {
     super(props)
 
+    this.sourcesQueue = []
+    this.streamlabsOBS = window.streamlabsOBS
     this.searchInput = null
     this.state = {
-      searchText: ''
+      searchText: '',
+      selectedTimeFrame: 0,
+      sourceLoaded: false,
     }
   }
 
@@ -72,6 +141,49 @@ class ChattersC extends React.Component<IProps, IState> {
 
     getChatters(dispatch, configs.data.profiles.twitch.name)
     window.Streamlabs.onMessage(this.onMessage)
+
+    if (!this.streamlabsOBS) { return }
+    this.streamlabsOBS.apiReady.then(() => {
+      const events: IEvents = {
+        Sources: ['sourceAdded', 'sourceRemoved', 'sourceUpdated'],
+        Scenes: ['sceneAdded', 'sceneRemoved', 'sceneSwitched']
+      }
+
+      this.detectIfSourceIsInScene()
+      Object.keys(events).forEach((key: string) => {
+        events[key].forEach((event: string) => {
+          this.streamlabsOBS.v1[key][event](this.detectIfSourceIsInScene)
+        })
+      })
+    })
+  }
+
+  private detectIfSourceIsInScene = async () => {
+    const scene = await this.streamlabsOBS.v1.Scenes.getActiveScene()
+    const sources = await this.streamlabsOBS.v1.Sources.getAppSources()
+    let sourceLoaded = false
+
+    this.nodeCrawler(scene.nodes)
+    this.sourcesQueue.forEach((node: any) => {
+      sources.forEach((source: any) => {
+        if (node.sourceId === source.id) {
+          sourceLoaded = true
+        }
+      })
+    })
+
+    this.setState({ sourceLoaded })
+    this.sourcesQueue = []
+  }
+
+  private async nodeCrawler(nodes: any[]) {
+    nodes.forEach(async (node: any) => {
+      if (node.type === 'folder') {
+        this.nodeCrawler(node)
+      } else if (node.type === 'scene_item') {
+        this.sourcesQueue.push(node)
+      }
+    })
   }
 
   private onMessage = (event: MessageEvent) => {
@@ -222,30 +334,30 @@ class ChattersC extends React.Component<IProps, IState> {
     }
   }
 
-  private groupDataByTimeframe = (data: any[], prop: string, timeframe: number, startTime: number, endTime: number) => {
+  private groupDataBytimeFrame = (data: any[], prop: string, timeFrame: number, startTime: number, endTime: number) => {
     const sortedData = data.sort((a, b) => a[prop] - b[prop])
-    const dataByTimeframe: any = {}
+    const dataBytimeFrame: any = {}
     let currentTime = startTime
     let index = 0
 
     while (currentTime < endTime) {
-      dataByTimeframe[currentTime] = 0
+      dataBytimeFrame[currentTime] = 0
       while (index < sortedData.length && sortedData[index][prop] < startTime) {
         index++
       }
 
       while (index < sortedData.length && sortedData[index][prop] < currentTime) {
         if (sortedData[index][prop]) {
-          dataByTimeframe[currentTime]++
+          dataBytimeFrame[currentTime]++
         }
 
         index++
       }
 
-      currentTime += timeframe
+      currentTime += timeFrame
     }
 
-    return dataByTimeframe
+    return dataBytimeFrame
   }
 
   private chartDataTransformer = () => {
@@ -260,16 +372,20 @@ class ChattersC extends React.Component<IProps, IState> {
       }
     })
 
-    const firstJoinedGroupedData = this.groupDataByTimeframe(chattersArray, 'firstJoinedTimestamp', 60 * 60 * 1000, moment().startOf('day').valueOf(),
-            moment().local().endOf('day').valueOf())
-    const firstChatMessageGroupedData = this.groupDataByTimeframe(chattersArray, 'firstChatMessageTimestamp', 60 * 60 * 1000, moment().startOf('day').valueOf(),
-           moment().local().endOf('day').valueOf())
+    const firstJoinedGroupedData = this.groupDataBytimeFrame(chattersArray, 'firstJoinedTimestamp',
+                timeFrames[this.state.selectedTimeFrame].interval, timeFrames[this.state.selectedTimeFrame].startTime, timeFrames[this.state.selectedTimeFrame].endTime)
+    const firstChatMessageGroupedData = this.groupDataBytimeFrame(chattersArray, 'firstChatMessageTimestamp',
+                timeFrames[this.state.selectedTimeFrame].interval, timeFrames[this.state.selectedTimeFrame].startTime, timeFrames[this.state.selectedTimeFrame].endTime)
 
     return Object.keys(firstJoinedGroupedData).map((timestamp) => ({
-      name: moment(parseInt(timestamp, 10)).format('HH:mm'),
+      name: moment(parseInt(timestamp, 10)).format(timeFrames[this.state.selectedTimeFrame].format),
       firstNewViewers: firstJoinedGroupedData[timestamp],
       firstNewMessages: firstChatMessageGroupedData[timestamp]
     }))
+  }
+
+  private onTimeFrameSelect = (selectedTimeFrame: number) => {
+    this.setState({selectedTimeFrame})
   }
 
   public render() {
@@ -277,24 +393,55 @@ class ChattersC extends React.Component<IProps, IState> {
 
     return (
       <Content className={style.chatters}>
-        <Card className={style.chattersCard}>
+        <Row>
+          <Col span={18}>
+            <Card className={style.chattersCard} title="Chart" extra={
+              <Select defaultValue={0} onChange={this.onTimeFrameSelect} className={style.timeFrameSelect}>
+                {timeFrames.map((timeFrame, index) => (
+                  <Option key={timeFrame.label} value={index}>{timeFrame.label}</Option>
+                ))}
+              </Select>}
+            >
+              {chatters.isFetching && <Spinner />}
+              {chatters.error && <h2>Error loading chatters</h2>}
+              {!chatters.isFetching && !chatters.error && <div>
+                <ResponsiveContainer height={400} width="100%">
+                  <LineChart width={730} height={250} data={this.chartDataTransformer()}
+                    margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <ChartTooltip />
+                    <Legend />
+                    <Line type="linear" dataKey="firstNewViewers" stroke="#8884d8" name="First new viewers" />
+                    <Line type="linear" dataKey="firstNewMessages" stroke="#82ca9d" name="First new messages" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>}
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card className={style.chattersCard} title="Status">
+              <div className={style.sourceLoaded}>
+                {this.state.sourceLoaded && <Tooltip placement="bottomRight" title="New users are being recorded">
+                  <span style={{color: '#52c41a'}}>Status: Active</span>
+                </Tooltip>}
+                {!this.state.sourceLoaded &&
+                  <Tooltip
+                    placement="bottomRight"
+                    title="New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene"
+                  >
+                  <span style={{color: '#f5222d'}}>Status: Inactive</span>
+                </Tooltip>}
+              </div>
+            </Card>
+          </Col>
+        </Row>
+        <Card className={style.chattersCard} title="Chatters">
           {chatters.isFetching && <Spinner />}
           {chatters.error && <h2>Error loading chatters</h2>}
           {!chatters.isFetching && !chatters.error && <div>
-            <h1>Chatters</h1>
             <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.tableDataTransformer)} columns={this.getColumns()} />
-            <ResponsiveContainer height={400} width="100%">
-              <LineChart width={730} height={250} data={this.chartDataTransformer()}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="linear" dataKey="firstNewViewers" stroke="#8884d8" />
-                <Line type="linear" dataKey="firstNewMessages" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
           </div>}
         </Card>
       </Content>

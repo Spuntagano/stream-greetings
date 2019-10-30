@@ -219,15 +219,13 @@ class SettingsC extends React.Component<IProps, IState> {
 
     return (
       <Content className={style.settings}>
-        <Card className={style.settingsCard}>
+        <Card className={style.settingsCard} title="Settings" extra={
+          <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>}
+        >
           {settings.isFetching && <Spinner />}
           {settings.error && <h2>Error loading settings</h2>}
           {!settings.isFetching && !settings.error && <div>
             <Form onSubmit={this.submit} layout="horizontal">
-              <div className="clearfix">
-                <h1 className={style.title}>Settings</h1>
-                <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>
-              </div>
               <div className="clearfix">
                 <div className={style.halfCol}>
                   <Form.Item {...formItemTopLayout} label="Show New Viewer Notification">

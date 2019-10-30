@@ -1,22 +1,3 @@
-.AppContainer {
-  .navigation {
-    width: calc(100% - 200px);
-    float: left;
-  }
-
-  .sourceLoaded {
-    width: 200px;
-    float: left;
-    text-align: right;
-    border-bottom: 1px solid #17171f;
-    line-height: 63px;
-    height: 64px;
-    font-weight: 700;
-    font-size: 16px;
-    padding-right: 35px;
-  }
-}
-
 .carousel {
   ul > li > button {
     background-color: #1890ff !important;
