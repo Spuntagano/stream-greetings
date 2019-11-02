@@ -60,7 +60,8 @@ interface IColumn {
   key: string
   sorter?: (a: IChatterTransformed, b: IChatterTransformed) => number
   defaultSortOrder?: 'descend' | 'ascend' | undefined
-  className?: string
+  className?: string,
+  width?: number
 }
 
 interface IChatterTransformed {
@@ -271,13 +272,15 @@ class ChattersC extends React.Component<IProps, IState> {
         dataIndex: 'latestActionDate',
         key: 'latestActionDate',
         sorter: (a: IChatterTransformed, b: IChatterTransformed) => (parseInt((b.latestActionTimestamp), 10) - parseInt((a.latestActionTimestamp), 10)),
-        defaultSortOrder: 'ascend'
+        defaultSortOrder: 'ascend',
+        width: 150
       },
       {
         title: 'Username',
         dataIndex: 'username',
         key: 'username',
         sorter: (a: IChatterTransformed, b: IChatterTransformed) => (a.username.localeCompare(b.username)),
+        width: 200,
         ...this.getColumnSearchProps('username'),
       },
       {
@@ -290,6 +293,7 @@ class ChattersC extends React.Component<IProps, IState> {
         title: 'Replay',
         dataIndex: 'replay',
         key: 'replay',
+        width: 100,
         className: style.chattersReplay
       }
     ]
