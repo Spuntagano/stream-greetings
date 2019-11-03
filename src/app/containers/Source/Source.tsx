@@ -57,7 +57,7 @@ class SourceC extends React.Component<IProps, IState> {
     this.notificationsPostInterval = null
   }
 
-  public async componentDidMount() {
+  public async componentWillMount() {
     const { dispatch } = this.props
 
     window.Streamlabs.onMessage((event: MessageEvent) => {

@@ -49,7 +49,7 @@ class AppC extends React.Component<IProps, IState> {
     ]
   }
 
-  public async componentDidMount() {
+  public async componentWillMount() {
     const { dispatch } = this.props
 
     try {

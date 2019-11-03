@@ -49,14 +49,21 @@ class SettingsC extends React.Component<IProps, IState> {
     super(props)
   }
 
-  public async componentDidMount() {
+  public async componentWillMount() {
     const { dispatch, form } = this.props
 
-    await getHints(dispatch)
-    const settings = await getSettings(dispatch)
-    form.setFieldsValue({
-      ...settings,
-    })
+    try {
+      await getHints(dispatch)
+      const settings = await getSettings(dispatch)
+      form.setFieldsValue({
+        ...settings,
+      })
+    } catch (e) {
+      notification.open({
+        message: 'An error as occured',
+        icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
+      })
+    }
   }
 
   private submit = async (e: React.FormEvent<any>) => {

@@ -3,10 +3,9 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import moment from 'moment'
 import Select from 'antd/lib/select'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip as ChartTooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters'
 import { IStore } from '../../redux/IStore'
-import Tooltip from 'antd/lib/tooltip'
 import Layout from 'antd/lib/layout'
 import Table from 'antd/lib/table'
 import Card from 'antd/lib/card'
@@ -137,10 +136,19 @@ class ChattersC extends React.Component<IProps, IState> {
     }
   }
 
-  public componentDidMount() {
+  public componentWillMount() {
     const { dispatch, configs } = this.props
 
-    getChatters(dispatch, configs.data.profiles.twitch.name)
+    try {
+      getChatters(dispatch, configs.data.profiles.twitch.name)
+    } catch (e) {
+      notification.open({
+        message: 'An error as occured',
+        icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
+        duration: 0
+      })
+    }
+
     window.Streamlabs.onMessage(this.onMessage)
 
     if (!this.streamlabsOBS) { return }
@@ -399,7 +407,7 @@ class ChattersC extends React.Component<IProps, IState> {
       <Content className={style.chatters}>
         <Row>
           <Col span={18}>
-            <Card className={style.chattersCard} title="Chart" extra={
+            <Card className={style.chartCard} title="Chart" extra={
               <Select defaultValue={0} onChange={this.onTimeFrameSelect} className={style.timeFrameSelect}>
                 {timeFrames.map((timeFrame, index) => (
                   <Option key={timeFrame.label} value={index}>{timeFrame.label}</Option>
@@ -409,13 +417,13 @@ class ChattersC extends React.Component<IProps, IState> {
               {chatters.isFetching && <Spinner />}
               {chatters.error && <h2>Error loading chatters</h2>}
               {!chatters.isFetching && !chatters.error && <div>
-                <ResponsiveContainer height={400} width="100%">
+                <ResponsiveContainer height={300} width="100%">
                   <LineChart width={730} height={250} data={this.chartDataTransformer()}
                     margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <ChartTooltip />
+                    <Tooltip />
                     <Legend />
                     <Line type="linear" dataKey="firstNewViewers" stroke="#8884d8" name="First new viewers" />
                     <Line type="linear" dataKey="firstNewMessages" stroke="#82ca9d" name="First new messages" />
@@ -425,18 +433,15 @@ class ChattersC extends React.Component<IProps, IState> {
             </Card>
           </Col>
           <Col span={6}>
-            <Card className={style.chattersCard} title="Status">
-              <div className={style.sourceLoaded}>
-                {this.state.sourceLoaded && <Tooltip placement="bottomRight" title="New users are being recorded">
-                  <span style={{color: '#52c41a'}}>Status: Active</span>
-                </Tooltip>}
-                {!this.state.sourceLoaded &&
-                  <Tooltip
-                    placement="bottomRight"
-                    title="New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene"
-                  >
-                  <span style={{color: '#f5222d'}}>Status: Inactive</span>
-                </Tooltip>}
+            <Card className={style.statusCard} title="Status">
+              <div className={style.status}>
+                {this.state.sourceLoaded && <div>
+                  <h2 style={{color: '#52c41a'}}>Status: Active</h2>
+                </div>}
+                {!this.state.sourceLoaded && <div>
+                  <h2 style={{color: '#f5222d'}}>Status: Inactive</h2>
+                  <p>New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene.</p>
+                </div>}
               </div>
             </Card>
           </Col>

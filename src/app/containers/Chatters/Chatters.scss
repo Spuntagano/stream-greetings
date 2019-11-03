@@ -1,18 +1,29 @@
 .chatters {
   .chattersCard {
-    margin: 32px
+    margin: 16px 32px 32px 32px;
+  }
+
+  .chartCard {
+    margin: 32px 16px 16px 32px;
+  }
+
+  .statusCard {
+    margin: 32px 32px 16px 16px;
+    height: 414px;
   }
 
   .chattersReplay {
-    text-align: center
+    text-align: center;
   }
 
   .timeFrameSelect {
     width: 120px;
   }
 
-  .sourceLoaded {
-    font-weight: 700;
-    font-size: 16px;
+  .status {
+    h2 {
+      font-weight: 700;
+      font-size: 24px;
+    }
   }
 }
