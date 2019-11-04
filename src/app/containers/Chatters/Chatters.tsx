@@ -20,6 +20,7 @@ import _ from 'lodash'
 import Icon from 'antd/lib/icon'
 import { IConfigsRequest } from '../../redux/modules/configs/configs'
 import { INotification } from '../../redux/modules/notifications/notifications'
+import { getSettings, ISettingsRequest } from '../../redux/modules/settings/settings'
 
 const { Option } = Select
 const { Content } = Layout
@@ -36,6 +37,7 @@ interface IGraphSelect {
 interface IProps {
   chatters: IChattersRequest
   configs: IConfigsRequest
+  settings: ISettingsRequest
   dispatch: Dispatch
   form: IGraphSelect
 }
@@ -140,6 +142,7 @@ class ChattersC extends React.Component<IProps, IState> {
     const { dispatch, configs } = this.props
 
     try {
+      getSettings(dispatch)
       getChatters(dispatch, configs.data.profiles.twitch.name)
     } catch (e) {
       notification.open({
@@ -401,7 +404,7 @@ class ChattersC extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const { chatters } = this.props
+    const { chatters, settings } = this.props
 
     return (
       <Content className={style.chatters}>
@@ -435,8 +438,11 @@ class ChattersC extends React.Component<IProps, IState> {
           <Col span={6}>
             <Card className={style.statusCard} title="Status">
               <div className={style.status}>
-                {this.state.sourceLoaded && <div>
+                {this.state.sourceLoaded && (settings.data.showFirstJoinedNotification || settings.data.showFirstChatMessageNotification) && <div>
                   <h2 style={{color: '#52c41a'}}>Status: Active</h2>
+                </div>}
+                {this.state.sourceLoaded && !settings.data.showFirstJoinedNotification && !settings.data.showFirstChatMessageNotification && <div>
+                  <h2 style={{color: '#f5222d'}}>Status: Recording</h2>
                 </div>}
                 {!this.state.sourceLoaded && <div>
                   <h2 style={{color: '#f5222d'}}>Status: Inactive</h2>
@@ -461,7 +467,8 @@ export const Chatters = connect(
   (state: IStore) => {
     return {
       chatters: state.chatters,
-      configs: state.configs
+      configs: state.configs,
+      settings: state.settings
     }
   },
   (d: Dispatch<IChattersAction>) => ({ dispatch: d })
