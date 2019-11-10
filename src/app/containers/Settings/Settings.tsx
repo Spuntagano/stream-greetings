@@ -225,116 +225,116 @@ class SettingsC extends React.Component<IProps, IState> {
 
     return (
       <Content className={style.settings}>
-        <Card className={style.settingsCard} title="Settings" extra={
-          <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>}
-        >
-          {settings.isFetching && <Spinner />}
-          {settings.error && <h2>Error loading settings</h2>}
-          {!settings.isFetching && !settings.error && settings.isLoaded && <div>
-            <Form onSubmit={this.submit} layout="horizontal">
-              <div className="clearfix">
-                <div className={style.halfCol}>
-                  <Form.Item {...formItemTopLayout} label="Show New Viewer Notification">
-                    {form.getFieldDecorator('showFirstJoinedNotification', { valuePropName: 'checked' })(<Switch onChange={this.onToggleNotification} />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Show First Chat Message Notification">
-                    {form.getFieldDecorator('showFirstChatMessageNotification', { valuePropName: 'checked' })(<Switch onChange={this.onToggleNotification} />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Show Image">
-                    {form.getFieldDecorator('showImage', { valuePropName: 'checked' })(<Switch />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Play Sound">
-                    {form.getFieldDecorator('playSound', { valuePropName: 'checked' })(<Switch />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Profanity Filter">
-                    {form.getFieldDecorator('profanityFilter', { valuePropName: 'checked' })(<Switch />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Primary color">
-                    {form.getFieldDecorator('primaryColor')(<ColorPicker />)}
-                  </Form.Item>
-                  <Form.Item {...formItemTopLayout} label="Secondary color">
-                    {form.getFieldDecorator('secondaryColor')(<ColorPicker />)}
-                  </Form.Item>
-                </div>
-                <div className={style.halfCol}>
-                  <div className={style.notificationPreview}>
-                    <Notification notification={this.getTestNotification()} settings={form.getFieldsValue()} display={true} />
+        <Form onSubmit={this.submit} layout="horizontal">
+          <Card className={style.settingsCard} title="Settings" extra={
+            <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>}
+          >
+            {settings.isFetching && <Spinner />}
+            {settings.error && <h2>Error loading settings</h2>}
+            {!settings.isFetching && !settings.error && settings.isLoaded && <div>
+                <div className="clearfix">
+                  <div className={style.halfCol}>
+                    <Form.Item {...formItemTopLayout} label="Show New Viewer Notification">
+                      {form.getFieldDecorator('showFirstJoinedNotification', { valuePropName: 'checked' })(<Switch onChange={this.onToggleNotification} />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Show First Chat Message Notification">
+                      {form.getFieldDecorator('showFirstChatMessageNotification', { valuePropName: 'checked' })(<Switch onChange={this.onToggleNotification} />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Show Image">
+                      {form.getFieldDecorator('showImage', { valuePropName: 'checked' })(<Switch />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Play Sound">
+                      {form.getFieldDecorator('playSound', { valuePropName: 'checked' })(<Switch />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Profanity Filter">
+                      {form.getFieldDecorator('profanityFilter', { valuePropName: 'checked' })(<Switch />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Primary color">
+                      {form.getFieldDecorator('primaryColor')(<ColorPicker />)}
+                    </Form.Item>
+                    <Form.Item {...formItemTopLayout} label="Secondary color">
+                      {form.getFieldDecorator('secondaryColor')(<ColorPicker />)}
+                    </Form.Item>
+                  </div>
+                  <div className={style.halfCol}>
+                    <div className={style.notificationPreview}>
+                      <Notification notification={this.getTestNotification()} settings={form.getFieldsValue()} display={true} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <Form.Item {...formItemBottomLayout} label="Font size">
-                  {form.getFieldDecorator('fontSize')(<Slider
-                    min={8}
-                    max={60}
-                  />)}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Font weight">
-                  {form.getFieldDecorator('fontWeight')(<Slider
-                    min={100}
-                    max={700}
-                    step={100}
-                  />)}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Line height">
-                  {form.getFieldDecorator('lineHeight')(<Slider
-                    min={1}
-                    max={1.5}
-                    step={0.01}
-                  />)}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Font family">
-                  {form.getFieldDecorator('fontFamily')(
-                    <Select>
-                      <Option value="arial">Arial</Option>
-                      <Option value="roboto">Roboto</Option>
-                      <Option value="oswald">Oswald</Option>
-                      <Option value="montserrat">Montserrat</Option>
-                      <Option value="open sans">Open Sans</Option>
-                    </Select>
-                  )}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="First Joined Message template">
-                  {form.getFieldDecorator('firstJoinedMessageTemplate')(<TextArea
-                    autoSize={{minRows: 5}}
+                <div>
+                  <Form.Item {...formItemBottomLayout} label="Font size">
+                    {form.getFieldDecorator('fontSize')(<Slider
+                      min={8}
+                      max={60}
                     />)}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="First Time Chatting Message template">
-                  {form.getFieldDecorator('firstMessageMessageTemplate')(<TextArea
-                    autoSize={{minRows: 5}}
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Font weight">
+                    {form.getFieldDecorator('fontWeight')(<Slider
+                      min={100}
+                      max={700}
+                      step={100}
                     />)}
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Notification image">
-                  <ImageUpload
-                    imageKey="notificationImage"
-                    onSubmit={this.onImageUpload}
-                    onRemove={this.onImageRemove}
-                    imageUrl={settings.data.notificationImageUrl}
-                  />
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Notification sound">
-                  <AudioUpload
-                    audioKey="notificationAudio"
-                    onSubmit={this.onAudioUpload}
-                    onRemove={this.onAudioRemove}
-                    audioUrl={settings.data.notificationAudioUrl} />
-                </Form.Item>
-                {form.getFieldDecorator('notificationImageUrl')(<Input type="hidden" />)}
-                {form.getFieldDecorator('notificationAudioUrl')(<Input type="hidden" />)}
-                <Form.Item {...formItemBottomLayout} label="Send a test notification">
-                  <Button className={style.testNotificationButton} type="default" onClick={this.testNotification}>Test notification</Button>
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Show the tutorial again">
-                  <Button className={style.redoTutorialButton} type="default" onClick={this.showTutorial}>Show tutorial</Button>
-                </Form.Item>
-                <Form.Item {...formItemBottomLayout} label="Clear settings data">
-                  <Button className={style.clearHintsButton} type="default" onClick={this.clearData}>Clear data</Button>
-                </Form.Item>
-                <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>
-              </div>
-            </Form>
-          </div>}
-        </Card>
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Line height">
+                    {form.getFieldDecorator('lineHeight')(<Slider
+                      min={1}
+                      max={1.5}
+                      step={0.01}
+                    />)}
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Font family">
+                    {form.getFieldDecorator('fontFamily')(
+                      <Select>
+                        <Option value="arial">Arial</Option>
+                        <Option value="roboto">Roboto</Option>
+                        <Option value="oswald">Oswald</Option>
+                        <Option value="montserrat">Montserrat</Option>
+                        <Option value="open sans">Open Sans</Option>
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="First Joined Message template">
+                    {form.getFieldDecorator('firstJoinedMessageTemplate')(<TextArea
+                      autoSize={{minRows: 5}}
+                      />)}
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="First Time Chatting Message template">
+                    {form.getFieldDecorator('firstMessageMessageTemplate')(<TextArea
+                      autoSize={{minRows: 5}}
+                      />)}
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Notification image">
+                    <ImageUpload
+                      imageKey="notificationImage"
+                      onSubmit={this.onImageUpload}
+                      onRemove={this.onImageRemove}
+                      imageUrl={settings.data.notificationImageUrl}
+                    />
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Notification sound">
+                    <AudioUpload
+                      audioKey="notificationAudio"
+                      onSubmit={this.onAudioUpload}
+                      onRemove={this.onAudioRemove}
+                      audioUrl={settings.data.notificationAudioUrl} />
+                  </Form.Item>
+                  {form.getFieldDecorator('notificationImageUrl')(<Input type="hidden" />)}
+                  {form.getFieldDecorator('notificationAudioUrl')(<Input type="hidden" />)}
+                  <Form.Item {...formItemBottomLayout} label="Send a test notification">
+                    <Button className={style.testNotificationButton} type="default" onClick={this.testNotification}>Test notification</Button>
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Show the tutorial again">
+                    <Button className={style.redoTutorialButton} type="default" onClick={this.showTutorial}>Show tutorial</Button>
+                  </Form.Item>
+                  <Form.Item {...formItemBottomLayout} label="Clear settings data">
+                    <Button className={style.clearHintsButton} type="default" onClick={this.clearData}>Clear data</Button>
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit" className={style.saveButton} loading={settings.isSaving}>Save settings</Button>
+                </div>
+            </div>}
+          </Card>
+        </Form>
       </Content>
     )
   }
