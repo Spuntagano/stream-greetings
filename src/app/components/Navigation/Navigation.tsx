@@ -17,17 +17,17 @@ class NavigationC extends React.Component<IProps & RouteComponentProps> {
     return (
       <div className={`${style.Navigation} ${className}`}>
         <Menu selectedKeys={[location.pathname]} mode="horizontal">
+        <Menu.Item key="/dashboard">
+            <Link to={{
+              pathname: '/dashboard',
+              search: location.search
+            }}>Dashboard</Link>
+          </Menu.Item>
           <Menu.Item key="/settings">
             <Link to={{
               pathname: '/settings',
               search: location.search
             }}>Settings</Link>
-          </Menu.Item>
-          <Menu.Item key="/chatters">
-            <Link to={{
-              pathname: '/chatters',
-              search: location.search
-            }}>Chatters</Link>
           </Menu.Item>
         </Menu>
       </div>

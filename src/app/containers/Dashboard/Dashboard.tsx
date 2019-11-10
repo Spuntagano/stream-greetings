@@ -3,14 +3,15 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import moment from 'moment'
 import Select from 'antd/lib/select'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { IChattersRequest, IChattersAction, IChatters, getChatters, addChatters } from '../../redux/modules/chatters/chatters'
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { IChattersRequest, IChattersAction, getChatters } from '../../redux/modules/chatters/chatters'
 import { IStore } from '../../redux/IStore'
 import Layout from 'antd/lib/layout'
 import Table from 'antd/lib/table'
 import Card from 'antd/lib/card'
 import Input from 'antd/lib/input'
 import Button from 'antd/lib/button'
+import Modal from 'antd/lib/Modal'
 import notification from 'antd/lib/notification'
 import Col from 'antd/lib/col'
 import Row from 'antd/lib/row'
@@ -20,10 +21,12 @@ import _ from 'lodash'
 import Icon from 'antd/lib/icon'
 import { IConfigsRequest } from '../../redux/modules/configs/configs'
 import { INotification } from '../../redux/modules/notifications/notifications'
+import { getSettings, setSettings, ISettingsRequest } from '../../redux/modules/settings/settings'
+import { IHintsRequest } from '../../redux/modules/hints/hints'
 
 const { Option } = Select
 const { Content } = Layout
-const style = require('./Chatters.scss')
+const style = require('./Dashboard.scss')
 
 interface IGraphSelect {
   label: string
@@ -36,6 +39,8 @@ interface IGraphSelect {
 interface IProps {
   chatters: IChattersRequest
   configs: IConfigsRequest
+  settings: ISettingsRequest
+  hints: IHintsRequest
   dispatch: Dispatch
   form: IGraphSelect
 }
@@ -94,31 +99,45 @@ const timeFrames: IGraphSelect[] = [{
   interval: 60 * 60 * 12 * 1000,
   startTime: moment().startOf('week').valueOf(),
   endTime: moment().endOf('week').valueOf(),
-  format: 'D:MMM HH:'
+  format: 'D MMM HH:mm'
 },
 {
   label: 'Last week',
   interval: 60 * 60 * 12 * 1000,
   startTime: moment().subtract(1, 'week').startOf('week').valueOf(),
   endTime: moment().subtract(1, 'week').endOf('week').valueOf(),
-  format: 'D:MMM HH:mm'
+  format: 'D MMM HH:mm'
 },
 {
   label: 'This month',
   interval: 60 * 60 * 24 * 1000,
   startTime: moment().startOf('month').valueOf(),
   endTime: moment().endOf('month').valueOf(),
-  format: 'D:MMM'
+  format: 'D MMM'
 },
 {
   label: 'Last month',
   interval: 60 * 60 * 24 * 1000,
   startTime: moment().subtract(1, 'month').startOf('month').valueOf(),
   endTime: moment().subtract(1, 'month').endOf('month').valueOf(),
-  format: 'D:MMM'
+  format: 'D MMM'
+},
+{
+  label: 'This Year',
+  interval: 60 * 60 * 24 * 31 * 1000,
+  startTime: moment().startOf('year').valueOf(),
+  endTime: moment().endOf('year').valueOf(),
+  format: 'MMM'
+},
+{
+  label: 'Last year',
+  interval: 60 * 60 * 24 * 31 * 1000,
+  startTime: moment().subtract(1, 'year').startOf('year').valueOf(),
+  endTime: moment().subtract(1, 'year').endOf('year').valueOf(),
+  format: 'MMM'
 }]
 
-class ChattersC extends React.Component<IProps, IState> {
+class DashboardC extends React.Component<IProps, IState> {
   private searchInput: Input | null
   private streamlabsOBS: any
   private sourcesQueue: any[]
@@ -136,11 +155,17 @@ class ChattersC extends React.Component<IProps, IState> {
     }
   }
 
-  public componentWillMount() {
-    const { dispatch, configs } = this.props
+  public componentDidMount() {
+    const { dispatch, configs, settings, chatters } = this.props
 
     try {
-      getChatters(dispatch, configs.data.profiles.twitch.name)
+      if (!chatters.isLoaded) {
+        getChatters(dispatch, configs.data.profiles.twitch.name)
+      }
+
+      if (!settings.isLoaded) {
+        getSettings(dispatch)
+      }
     } catch (e) {
       notification.open({
         message: 'An error as occured',
@@ -148,8 +173,6 @@ class ChattersC extends React.Component<IProps, IState> {
         duration: 0
       })
     }
-
-    window.Streamlabs.onMessage(this.onMessage)
 
     if (!this.streamlabsOBS) { return }
     this.streamlabsOBS.apiReady.then(() => {
@@ -193,19 +216,6 @@ class ChattersC extends React.Component<IProps, IState> {
         this.sourcesQueue.push(node)
       }
     })
-  }
-
-  private onMessage = (event: MessageEvent) => {
-    const { dispatch } = this.props
-
-    if (event.type === 'NOTIFICATIONS') {
-      const chatters: IChatters = {}
-      event.data.forEach((notification: INotification) => {
-        chatters[notification.username] = notification.chatter
-      })
-
-      addChatters(dispatch, chatters)
-    }
   }
 
   private getColumnSearchProps = (dataIndex: string) => {
@@ -400,8 +410,45 @@ class ChattersC extends React.Component<IProps, IState> {
     this.setState({selectedTimeFrame})
   }
 
+  private onActivate = () => {
+    const { hints } = this.props
+
+    if (hints.data.showToggleNotificationWarningModal) {
+      Modal.confirm({
+        title: 'Confirm',
+        content: 'Bla bla ...',
+        onOk: this.onActivateModalOk,
+      })
+    } else {
+      this.onActivateModalOk()
+    }
+  }
+
+  private onActivateModalOk = async () => {
+    const { dispatch, settings } = this.props
+
+    try {
+      await setSettings(dispatch, {
+        ...settings.data,
+        showFirstChatMessageNotification: true,
+        showFirstJoinedNotification: true
+      })
+      await window.Streamlabs.postMessage('SETTINGS', settings)
+
+      notification.open({
+        message: 'Settings saved',
+        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
+      })
+    } catch (e) {
+      notification.open({
+        message: 'An error as occured',
+        icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
+      })
+    }
+  }
+
   public render() {
-    const { chatters } = this.props
+    const { chatters, settings } = this.props
 
     return (
       <Content className={style.chatters}>
@@ -416,17 +463,16 @@ class ChattersC extends React.Component<IProps, IState> {
             >
               {chatters.isFetching && <Spinner />}
               {chatters.error && <h2>Error loading chatters</h2>}
-              {!chatters.isFetching && !chatters.error && <div>
+              {!chatters.isFetching && !chatters.error && chatters.isLoaded && <div>
                 <ResponsiveContainer height={300} width="100%">
                   <LineChart width={730} height={250} data={this.chartDataTransformer()}
                     margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
-                    <Line type="linear" dataKey="firstNewViewers" stroke="#8884d8" name="First new viewers" />
-                    <Line type="linear" dataKey="firstNewMessages" stroke="#82ca9d" name="First new messages" />
+                    <Legend iconType="circle" />
+                    <Line type="linear" dataKey="firstNewViewers" stroke="#2f54eb" strokeWidth={3} name="First new viewers" />
+                    <Line type="linear" dataKey="firstNewMessages" stroke="#722ed1" strokeWidth={3} name="First new messages" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>}
@@ -434,22 +480,32 @@ class ChattersC extends React.Component<IProps, IState> {
           </Col>
           <Col span={6}>
             <Card className={style.statusCard} title="Status">
-              <div className={style.status}>
-                {this.state.sourceLoaded && <div>
+              {settings.isFetching && <Spinner />}
+              {settings.error && <h2>Error loading settings</h2>}
+              {!settings.isFetching && !settings.error && settings.isLoaded && <div className={style.status}>
+                {this.state.sourceLoaded && (settings.data.showFirstChatMessageNotification || settings.data.showFirstJoinedNotification) && <div>
                   <h2 style={{color: '#52c41a'}}>Status: Active</h2>
+                </div>}
+                {this.state.sourceLoaded && !settings.data.showFirstChatMessageNotification && !settings.data.showFirstJoinedNotification && <div>
+                  <h2 style={{color: '#fadb14'}}>Status: Recording</h2>
+                  <p>
+                    The app is now recording new user joining and typing in chat for the first time, but notification are not being showed.
+                    You can click on the button below to activate them.
+                  </p>
+                  <Button type="primary" onClick={this.onActivate} loading={settings.isSaving}>Activate</Button>
                 </div>}
                 {!this.state.sourceLoaded && <div>
                   <h2 style={{color: '#f5222d'}}>Status: Inactive</h2>
                   <p>New users are not being recorded and notification's will not show up. Activate it by adding the extension's source into the active scene.</p>
                 </div>}
-              </div>
+              </div>}
             </Card>
           </Col>
         </Row>
         <Card className={style.chattersCard} title="Chatters">
           {chatters.isFetching && <Spinner />}
           {chatters.error && <h2>Error loading chatters</h2>}
-          {!chatters.isFetching && !chatters.error && <div>
+          {!chatters.isFetching && !chatters.error && chatters.isLoaded && <div>
             <Table className={style.chattersTable} dataSource={Object.keys(chatters.data).map(this.tableDataTransformer)} columns={this.getColumns()} />
           </div>}
         </Card>
@@ -457,12 +513,14 @@ class ChattersC extends React.Component<IProps, IState> {
     )
   }
 }
-export const Chatters = connect(
+export const Dashboard = connect(
   (state: IStore) => {
     return {
       chatters: state.chatters,
-      configs: state.configs
+      configs: state.configs,
+      settings: state.settings,
+      hints: state.hints
     }
   },
   (d: Dispatch<IChattersAction>) => ({ dispatch: d })
-)(ChattersC as any)
+)(DashboardC as any)

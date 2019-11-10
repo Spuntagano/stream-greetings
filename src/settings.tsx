@@ -7,7 +7,7 @@ import { renderRoutes } from 'react-router-config'
 import { HashRouter } from 'react-router-dom'
 const { browserHistory } = require('react-router')
 
-import { routes } from './app/routes'
+import { routes } from './app/routes/routes'
 
 import { configureStore } from './app/redux/store'
 

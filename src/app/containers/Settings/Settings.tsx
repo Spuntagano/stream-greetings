@@ -14,7 +14,7 @@ import Slider from 'antd/lib/slider'
 import Select from 'antd/lib/select'
 import Modal from 'antd/lib/Modal'
 import notification from 'antd/lib/notification'
-import { Spinner } from '../../components/Spinner/Spinner'
+import { Spinner } from '../../components'
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload'
 import { AudioUpload } from '../../components/AudioUpload/AudioUpload'
 import _ from 'lodash'
@@ -23,7 +23,7 @@ import { IConfigsRequest } from '../../redux/modules/configs/configs'
 import { Notification } from '../../components/Notification/Notification'
 import TextArea from 'antd/lib/input/TextArea'
 import { ColorPicker } from '../../components/ColorPicker/ColorPicker'
-import { deleteHints, getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints'
+import { deleteHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints'
 
 const { Content } = Layout
 const { Option } = Select
@@ -49,14 +49,13 @@ class SettingsC extends React.Component<IProps, IState> {
     super(props)
   }
 
-  public async componentWillMount() {
-    const { dispatch, form } = this.props
+  public async componentDidMount() {
+    const { dispatch, form, settings } = this.props
 
+    const settingsData = (settings.isLoaded) ? settings.data : await getSettings(dispatch)
     try {
-      await getHints(dispatch)
-      const settings = await getSettings(dispatch)
       form.setFieldsValue({
-        ...settings,
+        ...settingsData
       })
     } catch (e) {
       notification.open({
@@ -231,7 +230,7 @@ class SettingsC extends React.Component<IProps, IState> {
         >
           {settings.isFetching && <Spinner />}
           {settings.error && <h2>Error loading settings</h2>}
-          {!settings.isFetching && !settings.error && <div>
+          {!settings.isFetching && !settings.error && settings.isLoaded && <div>
             <Form onSubmit={this.submit} layout="horizontal">
               <div className="clearfix">
                 <div className={style.halfCol}>

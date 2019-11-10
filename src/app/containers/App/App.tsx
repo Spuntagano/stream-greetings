@@ -4,16 +4,18 @@ import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { getConfigs, IConfigsAction, IConfigsRequest } from '../../redux/modules/configs/configs'
+import { IChatters, addChatters } from '../../redux/modules/chatters/chatters'
 import { IStore } from '../../redux/IStore'
 import { Navigation } from '../../components'
 import { renderRoutes } from 'react-router-config'
-import { routes } from '../../routes'
+import { routes } from '../../routes/routes'
 import Icon from 'antd/lib/icon'
 import notification from 'antd/lib/notification'
 import Layout from 'antd/lib/layout'
 import Modal from 'antd/lib/Modal'
 import Carousel from 'antd/lib/carousel'
 import { getHints, IHintsRequest, setHints } from '../../redux/modules/hints/hints'
+import { INotification } from '../../redux/modules/notifications/notifications'
 
 const { Header } = Layout
 const style = require('./App.scss')
@@ -49,12 +51,19 @@ class AppC extends React.Component<IProps, IState> {
     ]
   }
 
-  public async componentWillMount() {
-    const { dispatch } = this.props
+  public async componentDidMount() {
+    const { dispatch, hints, configs } = this.props
+
+    window.Streamlabs.onMessage(this.onMessage)
 
     try {
-      await getConfigs(dispatch)
-      await getHints(dispatch)
+      if (!configs.isLoaded) {
+        await getConfigs(dispatch)
+      }
+
+      if (!hints.isLoaded) {
+        await getHints(dispatch)
+      }
       this.setState({ loaded: true })
     } catch (e) {
       notification.open({
@@ -62,6 +71,19 @@ class AppC extends React.Component<IProps, IState> {
         icon: <Icon type="exclamation-circle" style={{ color: '#ff0000' }} />,
         duration: 0
       })
+    }
+  }
+
+  private onMessage = (event: MessageEvent) => {
+    const { dispatch } = this.props
+
+    if (event.type === 'NOTIFICATIONS') {
+      const chatters: IChatters = {}
+      event.data.forEach((notification: INotification) => {
+        chatters[notification.username] = notification.chatter
+      })
+
+      addChatters(dispatch, chatters)
     }
   }
 
